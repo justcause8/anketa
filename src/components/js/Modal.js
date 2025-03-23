@@ -14,7 +14,7 @@ const Modal = ({ onClose, onRegisterOpen }) => {
                     Запомнить меня
                 </label>
                 <div className="modal-buttons">
-                    <button className="login-btn">войти</button>
+                    <button className="login-btn">Войти</button>
                     <button 
                         className="register-btn" 
                         onClick={() => {
@@ -22,7 +22,7 @@ const Modal = ({ onClose, onRegisterOpen }) => {
                             onRegisterOpen();
                         }}
                     >
-                        регистрация
+                        Регистрация
                     </button>
                 </div>
             </div>

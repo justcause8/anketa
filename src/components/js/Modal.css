@@ -67,6 +67,10 @@
     cursor: pointer;
     margin-left:60px;
 }
+.login-btn:hover{
+    background-color: #386ba4;
+
+}
 
 .register-btn {
     background-color: transparent;
@@ -79,6 +83,12 @@
     margin-right: 45px;
 }
 
+.register-btn:hover{
+    color: #314e70;
+    background-color: #4a91e249;
+
+}
+
 /* Кнопка закрытия */
 .modal-close {
     position: absolute;
@@ -89,6 +99,7 @@
     font-size: 24px;
     cursor: pointer;
 }
+
 
 @media (max-width: 393px) {
     .login-btn {

@@ -1,0 +1,225 @@
+@import url(https://fonts.googleapis.com/css?family=Manrope:200,300,regular,500,600,700,800);
+
+body {
+    background:rgba(226, 232, 253, 1);
+
+}
+.page-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+
+.survey-pageLink {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: rgb(255, 255, 255);
+    max-width: 60%;
+    margin: auto;
+    margin-top: 60px;
+    margin-bottom: 104px;
+    border-radius: 10px;
+
+    min-height: 59vh;
+
+}
+
+
+.You{
+    font-size: 64px;
+    display: flex;
+    justify-content: center;
+    margin-top:30px;
+
+    font-family: Rubik;
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 100px;
+    letter-spacing: 3%;
+
+}
+
+.survey-titleLink {
+    padding: 20px;
+    background: rgba(244, 245, 248, 1);
+    border-radius: 10px;
+    font-size: 28px;
+    margin: 100px;
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    gap: 10px; 
+}
+
+.button-group
+{
+    display: flex;
+    align-items: center;
+    gap:10px;
+}
+
+.link-text {
+    font-size: 20px;
+    margin-right: 10px; 
+    word-break: break-word;
+    white-space: normal; 
+    overflow-wrap: break-word;
+    max-width: 2000px;
+    display: inline-block; 
+}
+.Copy {
+    margin-right:20px;
+    width: auto; 
+    height: auto;
+    cursor: pointer; 
+}
+.Copy:hover{
+    border-radius: 5px; 
+    background-color: #b7b7b7;
+}
+
+.HomeLink {
+    display: flex;
+    align-items: center; 
+    justify-content: flex-start; 
+
+    font-family: Montserrat;
+    font-size: 28px;
+    color: rgba(63, 101, 241, 1);
+
+    margin-right: 100px;
+
+
+}
+
+.HomeLink span {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
+.HomeLink:hover{
+    color:rgb(43, 71, 175) ;
+}
+.Arrow {
+    width: auto;
+    height: auto;
+}
+
+.copy-popup {
+    position: absolute;
+    background: #4caf50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none; 
+}
+
+.copy-popup.hide {
+    opacity: 0;
+}
+
+
+
+
+/* Стили для кнопки "Показать QR" */
+.QRButton {
+    /* background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px; */
+    /* font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; */
+    width: 40px ;
+    /* height:max-content; */
+    cursor: pointer; 
+}
+
+.QRButton:hover {
+    border-radius: 5px; 
+    background-color: #b7b7b7;
+}
+
+/* Оверлей модального окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Контент модального окна */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Заголовок модального окна */
+.modal-content h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Изображение QR-кода */
+.qr-image {
+    width: 200px;
+    height: 200px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка закрытия модального окна */
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+/* Стили для всплывающего сообщения "Скопировано!" */
+.copy-popup {
+    position: absolute;
+    background-color: #4caf50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: fadeOut 2s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

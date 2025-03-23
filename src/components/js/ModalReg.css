@@ -88,8 +88,17 @@
     text-decoration: underline;
 }
 
+.reg-btn:hover{
+    background: rgb(42, 66, 156);
+
+}
+
 .perehod{
     padding-left:100px;
+}
+
+.modal label input[type="checkbox"] {
+    margin-right: 10px;
 }
 
 @media (max-width: 393px) {

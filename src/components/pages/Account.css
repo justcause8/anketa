@@ -1,0 +1,114 @@
+.ac-page {
+    font-family: Arial, sans-serif;
+    padding: 60px 20px 20px; /* Увеличиваем верхний отступ (60px) */
+    background-color: #ffffff;
+    max-width: 60%;
+    margin: auto;
+    border-radius: 10px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.Nick {
+    font-family: Rubik;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 35.55px;
+    letter-spacing: 0%;
+    padding: 20px 20px 0px;
+}
+
+.settingImg {
+    margin-left: 10px;
+}
+
+.type-qw {
+    font-family: Rubik;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 35.55px;
+    letter-spacing: 0%;
+    padding: 50px 20px 20px 20px;
+}
+
+.Open-list {
+    display: grid;
+    margin-left: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.Open {
+    justify-content: space-between;
+    outline: 2px solid #000;
+    width: auto;
+    max-width: 310px;
+    height: auto;
+    min-height: 250px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+
+.Open:hover {
+    transform: scale(1.25); /* Небольшое увеличение карточки */
+    z-index: 1; /* Поднимаем блок над другими элементами */
+}
+
+.text-lg {
+    font-family: Rubik;
+    font-weight: 300;
+    font-size: 24px;
+    line-height: 28.44px;
+    letter-spacing: 0%;
+    text-align: center;
+    margin: 0;
+    padding-left: 10px;
+
+    /* Разрешаем перенос текста */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+
+    /* Ограничение высоты и скрытие текста по умолчанию */
+    max-height: 84px; /* Высота для двух строк текста */
+    overflow: hidden;
+    transition: max-height 0.3s ease, background-color 0.3s ease, padding-bottom 0.3s ease;
+}
+
+.text-lg.expanded {
+    max-height: 200px; 
+    overflow: visible;
+    border-radius: 5px;
+}
+
+.cursorItems {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.left-cursor {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.right-cursor {
+    display: flex;
+    padding-right: 20px;
+}
+
+.right-cursor svg {
+    transition: transform 0.2s ease-in-out;
+}
+
+.right-cursor svg:hover {
+    transform: scale(1.2);
+    color: red;
+}

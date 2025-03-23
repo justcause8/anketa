@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 import "./header.css";
 import './reset.css';
 import pictureMain from './../../img/pictureMain.png';
@@ -32,11 +32,11 @@ function Header() {
                             <span >прямо сейчас</span>
                         </div>
                     </h1>
-                    <a href="#!" className="btn">Создать анкету</a>
+                    <Link to="/create" className="btn">Создать анкету</Link>
                 </div>
                 <img src={pictureMain} alt="Project img" className="imgMain" />
                 <img src={imgMain2} alt="Project img" className="imgMain2" />
-                <a href="#!" className="btn2">Создать анкету</a>
+                <Link to="/create" className="btn2">Создать анкету</Link>
             </header>
 
             <main className="section">

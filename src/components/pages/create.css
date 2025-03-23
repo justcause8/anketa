@@ -1,0 +1,313 @@
+
+.survey-page {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f5f7ff;
+    max-width: 60%;
+    margin: auto;
+    margin-top: 60px;
+    margin-bottom: 150px;
+    border-radius: 10px;
+
+}
+
+/* Блок названия анкеты */
+.survey-title {
+    margin-bottom: 60px;
+    padding: 20px;
+    padding-bottom: 50px;
+    background: rgb(255, 255, 255);
+    border-radius: 10px;
+    font-size: 28px;
+
+}
+
+.survey-title span {
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.survey-title input {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    font-size: 16px;
+    padding: 5px 0;
+    outline: none;
+}
+
+
+.survey-title input:focus {
+    border-bottom: 1px solid blue;
+}
+
+/* Блок вопроса */
+
+.question {
+    padding: 20px;
+    padding-bottom: 50px;
+    background: rgb(255, 255, 255);
+    border-radius: 10px;
+    font-size: 28px;
+    
+    
+}
+
+.numberQuestion {
+    float: right;
+    font-family: Montserrat;
+    font-size: 20px;
+
+    color: rgb(31, 30, 30);
+}
+
+
+.question span {
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+    
+}
+
+.question input {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    font-size: 16px;
+    padding: 5px 0;
+    outline: none;
+    
+}
+
+
+.question input:focus {
+    border-bottom: 1px solid blue;
+}
+
+
+
+/*Вопрос*/
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 5px;
+    padding: 0;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+
+}
+
+.punkt {
+    position: relative;
+    top: 10px;
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    background: rgba(252, 163, 19, 1);
+    margin-left: 10px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+
+.punktGalka {
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top: 12px solid white;
+
+    margin: auto;
+    margin-top: 12px;
+}
+
+.punktGalka.rotate {
+    margin-top: 0px;
+    transform: rotate(180deg);
+}
+.punkt:hover {
+    background-color: rgb(255, 136, 0);
+}
+
+
+/*Добавление, свап, удаление*/
+.action {
+    display: flex;
+    align-items: center; 
+    gap: 20px; 
+    padding: 20px;
+}
+
+/* Новый блок */
+.newBlock {
+    font-family: Montserrat;
+    font-size: 28px;
+    color: rgba(139, 133, 133, 1);
+    cursor: pointer;
+    transition: all 0.06s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+/* Секция с иконками стрелок */
+.swap {
+    font-family: Montserrat;
+    font-size: 28px;
+    margin-left: 30px;
+    color: rgba(139, 133, 133, 1);
+    display: inline-flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+/* Иконки внутри .swap */
+.swap svg {
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+}
+
+/* Стили для кнопок стрелок */
+.bi-arrow-up, .bi-arrow-down {
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+}
+
+/* Стиль для блока с иконкой плюса */
+.bi-plus {
+    width: 50px;
+    height: 50px;
+}
+
+.trash {
+    font-family: Montserrat;
+    font-size: 28px;
+    color: rgba(139, 133, 133, 1);
+    display: inline-flex;
+    align-items: center; 
+    gap: 10px; 
+    margin-left: auto; 
+}
+/* Иконка корзины */
+.bi-trash {
+    width: 30px;
+    height: 30px;
+}
+
+
+/*Множественный выбор*/
+.add-button {
+    font-family: Montserrat;
+    font-size: 24px;
+    color:#ffffff;
+    padding: 5px 15px 5px 15px;
+    margin-top:20px;
+    border-radius: 6px;
+    background: rgba(252, 163, 19, 1);    
+}
+
+.add-button:hover {
+    background-color: rgb(255, 136, 0);
+}
+
+.delete-button {
+    font-family: Montserrat;
+    font-size: 24px;
+    color: rgb(255, 136, 0);
+    padding: 5px 15px 5px 15px;
+    margin-top: 20px;
+    border-radius: 6px;
+    background: white;
+    border: 2px solid orange;
+    margin-left:10px; 
+}
+
+/*Кнопка сохранить*/
+.ButtonSaveContainer {
+    display: flex;
+    justify-content: flex-end; 
+    margin-top:50px;
+    text-align: center;
+}
+
+.ButtonSave {
+    background: rgba(63, 101, 241, 1);
+
+    border-radius: 6px;
+    font-family: Montserrat;
+    font-weight: 100;
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.81);
+    width: 170px;
+    padding: 15px;
+}
+
+.ButtonSave:hover{
+    background-color:  #304ebc;
+}
+/*Анимация*/
+.move-up {
+    animation: moveUp 0.5s ease-in-out;
+}
+
+.move-down {
+    animation: moveDown 0.5s ease-in-out;
+}
+
+@keyframes moveUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-10px); /* Плавное движение к верхней позиции */
+        opacity: 0.5; /* Прозрачность для промежуточного состояния */
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes moveDown {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(10px); /* Плавное движение к нижней позиции */
+        opacity: 0.5; /* Прозрачность для промежуточного состояния */
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+

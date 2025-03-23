@@ -5,6 +5,7 @@ import ModalRegister from '../js/ModalReg';
 import BtnDarkMode from '../btnDarkMode/BtnDarkMode';
 import '../header/header.css';
 import logo from './../../img/logo_checklist.png';
+import "./Navbar.css";
 
 const Navbar = () => {
     const [isLoginModalOpen, setLoginModalOpen] = useState(false);
