@@ -1,22 +1,97 @@
-import React from 'react';
+import React, { useState } from 'react';
+import apiClient from '../apiContent/apiClient'; // Импортируем API-клиент
 import './ModalReg.css';
 
-const Modal = ({ onClose, onLoginOpen }) => { 
+const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isChecked, setIsChecked] = useState(false);
+
+    // Функция для обработки регистрации
+    const handleRegister = async () => {
+        if (!isChecked) {
+            alert('Пожалуйста, подтвердите согласие на обработку персональных данных.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Пароли не совпадают.');
+            return;
+        }
+
+        try {
+            const response = await apiClient.post('/auth/register', {
+                Username: username,
+                Email: email,
+                PasswordHash: password,
+                AccessLevelId: 2, // Уровень доступа по умолчанию
+            });
+
+            const { access_token } = response.data;
+
+            // Сохраняем токен в localStorage
+            localStorage.setItem('access_token', access_token);
+
+            // Уведомляем Navbar об успешной регистрации
+            onRegisterSuccess();
+
+            alert('Вы успешно зарегистрировались!');
+            onClose(); // Закрываем модальное окно
+        } catch (error) {
+            console.error('Ошибка регистрации:', error.response?.data || error.message);
+            alert('Ошибка регистрации. Проверьте введенные данные.');
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>×</button>
+                <button className="modal-close" onClick={onClose}>
+                    ×
+                </button>
                 <h2>Регистрация</h2>
-                <input type="email" placeholder="Эл. почта" />
-                <input type="password" placeholder="Пароль" />
-                <input type="password" placeholder="Подтвердите пароль" />
+                <input
+                    type="text"
+                    placeholder="Имя пользователя"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                    type="email"
+                    placeholder="Эл. почта"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Пароль"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Подтвердите пароль"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                />
                 <label>
-                    <input type="checkbox" />
+                    <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => setIsChecked(e.target.checked)}
+                    />
                     Я согласен на&nbsp;
                     <button
                         type="button"
                         className="link-button"
-                        onClick={() => window.open('https://www.figma.com/design/FnqNuTY0TwAiTo1mSKRADx/Конструктор-анкет?node-id=0-1&node-type=canvas&t=AVcmbkWQHdclinB5-0', '_blank')}
+                        onClick={() =>
+                            window.open(
+                                'https://www.figma.com/design/FnqNuTY0TwAiTo1mSKRADx/Конструктор-анкет?node-id=0-1&node-type=canvas&t=AVcmbkWQHdclinB5-0',
+                                '_blank'
+                            )
+                        }
                     >
                         обработку персональных данных
                     </button>
@@ -27,16 +102,22 @@ const Modal = ({ onClose, onLoginOpen }) => {
                     <button
                         type="button"
                         className="link-button"
-                        onClick={() => window.open('https://avatars.mds.yandex.net/i?id=7f227e472ce817cdad5bb5a582e0e331_l-10340874-images-thumbs&n=13')}
+                        onClick={() =>
+                            window.open(
+                                'https://avatars.mds.yandex.net/i?id=7f227e472ce817cdad5bb5a582e0e331_l-10340874-images-thumbs&n=13'
+                            )
+                        }
                     >
                         с политикой конфиденциальности
                     </button>
                 </label>
                 <div className="modal-buttons">
-                    <button className="reg-btn">Зарегистрироваться</button>
+                    <button className="reg-btn" onClick={handleRegister}>
+                        Зарегистрироваться
+                    </button>
                 </div>
-                <label 
-                    className="link-button perehod" 
+                <label
+                    className="link-button perehod"
                     onClick={() => {
                         onClose();
                         onLoginOpen();
@@ -49,4 +130,4 @@ const Modal = ({ onClose, onLoginOpen }) => {
     );
 };
 
-export default Modal;
+export default ModalReg;

@@ -1,173 +1,156 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-
+import apiClient from '../apiContent/apiClient';
 import './create.css';
+// import { Link } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const SurveyPage = () => {
     const [questions, setQuestions] = useState([
         { id: 1, type: "Открытый", text: "", answers: [] },
     ]);
-
     const [draggedId, setDraggedId] = useState(null);
-
-    const [dropdownsOpen, setDropdownsOpen] = useState({}); // Состояние для каждого меню
+    const [dropdownsOpen, setDropdownsOpen] = useState({});
 
     const options = ["Открытый", "Закрытый", "Множественный выбор", "Шкала"];
 
-    // Драгон дроп
+    // Преобразование типа вопроса в числовой ID
+    const getQuestionTypeId = (type) => {
+        switch (type) {
+            case "Открытый":
+                return 1;
+            case "Закрытый":
+                return 2;
+            case "Множественный выбор":
+                return 3;
+            case "Шкала":
+                return 4;
+            default:
+                throw new Error("Неизвестный тип вопроса.");
+        }
+    };
+
+    // Обработчик сохранения анкеты
+    const handleSave = async () => {
+        try {
+            const title = document.querySelector('.survey-title input').value;
+            if (!title) {
+                alert('Введите название анкеты.');
+                return;
+            }
+
+            const questionnaireId = await createQuestionnaire(title, questions);
+            alert(`Анкета успешно создана! ID: ${questionnaireId}`);
+        } catch (error) {
+            console.error('Ошибка при сохранении анкеты:', error.response?.data || error.message);
+            alert('Ошибка при сохранении анкеты.');
+        }
+    };
+
+    // Функция для создания анкеты
+    const createQuestionnaire = async (title, questions) => {
+        try {
+            const response = await apiClient.post('/questionnaire/create', {
+                Title: title,
+            });
+
+            const questionnaireId = response.data.questionnaireId;
+
+            // Добавляем вопросы к анкете
+            for (const question of questions) {
+                await addQuestion(questionnaireId, question);
+            }
+
+            return questionnaireId;
+        } catch (error) {
+            console.error('Ошибка при создании анкеты:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    // Функция для добавления вопроса
+    const addQuestion = async (questionnaireId, question) => {
+        try {
+            await apiClient.post(`/questionnaire/${questionnaireId}/questions/add-question`, {
+                Text: question.text,
+                QuestionType: getQuestionTypeId(question.type),
+                Options: question.answers?.map((a) => a.text) || [],
+            });
+        } catch (error) {
+            console.error('Ошибка при добавлении вопроса:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    // Перетаскивание вопросов
     const handleDrop = (e, targetId) => {
         e.preventDefault();
-
         if (draggedId === targetId) return;
-
         const updatedQuestions = [...questions];
         const draggedQuestion = updatedQuestions.find(q => q.id === draggedId);
         const targetIndex = updatedQuestions.findIndex(q => q.id === targetId);
         const draggedIndex = updatedQuestions.findIndex(q => q.id === draggedId);
 
-        // Убираем перетаскиваемый элемент из старой позиции
         updatedQuestions.splice(draggedIndex, 1);
-        // Вставляем его в новую позицию
         updatedQuestions.splice(targetIndex, 0, draggedQuestion);
 
-        // Пересчитываем id для всех вопросов
         const newQuestionsWithIds = updatedQuestions.map((question, index) => ({
             ...question,
             id: index + 1,
         }));
-
         setQuestions(newQuestionsWithIds);
     };
 
-    // Драгон дроп
     const handleDragStart = (id) => {
-        setDraggedId(id); // Устанавливаем ID перетаскиваемого элемента
+        setDraggedId(id);
     };
-    // Драгон дроп
-    const handleDragOver = (e) => {
-        e.preventDefault(); // Разрешаем перетаскивание
-    };
-    
 
-    // Добавление нового вопроса под текущим
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    // Добавление нового вопроса
     const addNewQuestion = (id) => {
         const newQuestion = { type: "Открытый", text: "", answers: [] };
         const index = questions.findIndex(q => q.id === id);
         const updatedQuestions = [...questions];
         updatedQuestions.splice(index + 1, 0, newQuestion);
 
-        // Пересчет id для всех вопросов
         const newQuestionsWithIds = updatedQuestions.map((question, index) => ({
             ...question,
             id: index + 1,
         }));
-
         setQuestions(newQuestionsWithIds);
     };
+
+    // Удаление вопроса
+    const deleteQuestion = (id) => {
+        const index = questions.findIndex(q => q.id === id);
+        if (index !== -1) {
+            const updatedQuestions = [...questions];
+            updatedQuestions.splice(index, 1);
+
+            const newQuestionsWithIds = updatedQuestions.map((q, i) => ({
+                ...q,
+                id: i + 1,
+            }));
+            setQuestions(newQuestionsWithIds);
+        }
+    };
+
     // Изменение типа вопроса
     const handleOptionSelect = (id, option) => {
         setQuestions(questions.map(q =>
             q.id === id ? { ...q, type: option } : q
         ));
-        setDropdownsOpen({ ...dropdownsOpen, [id]: false }); 
+        setDropdownsOpen({ ...dropdownsOpen, [id]: false });
     };
 
-    // Переключение видимости меню для конкретного вопроса
-    const toggleDropdown = (id) => {
-        setDropdownsOpen({ ...dropdownsOpen, [id]: !dropdownsOpen[id] });
-    };
-
-
-    const moveQuestionUp = (id) => {
-        const index = questions.findIndex(q => q.id === id);
-        if (index > 0) {
-            const updatedQuestions = [...questions];
-
-            const questionElementUp = document.getElementById(`question-${id}`);
-            const questionElementDown = document.getElementById(`question-${updatedQuestions[index - 1].id}`);
-
-            questionElementUp.classList.add('move-up');
-            questionElementDown.classList.add('move-down');
-
-            setTimeout(() => {
-                [updatedQuestions[index], updatedQuestions[index - 1]] = [updatedQuestions[index - 1], updatedQuestions[index]]; 
-                setQuestions(updatedQuestions);
-
-                const newQuestionsWithIds = updatedQuestions.map((q, i) => ({
-                    ...q,
-                    id: i + 1,
-                }));
-                setQuestions(newQuestionsWithIds);
-
-                questionElementUp.classList.remove('move-up');
-                questionElementDown.classList.remove('move-down');
-            }, 70); 
-        }
-    };
-
-    const moveQuestionDown = (id) => {
-        const index = questions.findIndex(q => q.id === id);
-        if (index < questions.length - 1) {
-            const updatedQuestions = [...questions];
-
-            const questionElementDown = document.getElementById(`question-${id}`);
-            const questionElementUp = document.getElementById(`question-${updatedQuestions[index + 1].id}`);
-
-            questionElementDown.classList.add('move-down');
-            questionElementUp.classList.add('move-up');
-
-            setTimeout(() => {
-                [updatedQuestions[index], updatedQuestions[index + 1]] = [updatedQuestions[index + 1], updatedQuestions[index]]; 
-                setQuestions(updatedQuestions);
-
-                const newQuestionsWithIds = updatedQuestions.map((q, i) => ({
-                    ...q,
-                    id: i + 1,
-                }));
-                setQuestions(newQuestionsWithIds);
-
-                questionElementDown.classList.remove('move-down');
-                questionElementUp.classList.remove('move-up');
-            }, 70); 
-        }
-    };
-
-
-    const deleteQuestion = (id) => {
-        const index = questions.findIndex(q => q.id === id);
-        if (index !== -1) {
-            const delQuestions = [...questions]; 
-            delQuestions.splice(index, 1); 
-
-            const newQuestionsWithIds = delQuestions.map((q, i) => ({
-                ...q,
-                id: i + 1, 
-            }));
-            setQuestions(newQuestionsWithIds); // Обновляем состояние
-        }
-    };
-
-    // Обновление текста ответа для вопроса "Множественный выбор"
-    const updateAnswerText = (questionId, answerId, newText) => {
-        setQuestions(questions.map(q => {
-            if (q.id === questionId && q.answers) {
-                return {
-                    ...q,
-                    answers: q.answers.map(a =>
-                        a.id === answerId ? { ...a, text: newText } : a
-                    ),
-                };
-            }
-            return q;
-        }));
-    };
-
-    // Добавление нового ответа для вопроса "Множественный выбор"
+    // Добавление ответа
     const addAnswer = (questionId) => {
         setQuestions(questions.map(q => {
             if (q.id === questionId) {
                 const newAnswer = {
-                    id: (q.answers?.length || 0) + 1, 
+                    id: (q.answers?.length || 0) + 1,
                     text: "",
                 };
                 return {
@@ -179,7 +162,7 @@ const SurveyPage = () => {
         }));
     };
 
-    // Удаление нового ответа для вопроса "Множественный выбор"
+    // Удаление ответа
     const deletAnswer = (questionId) => {
         setQuestions(questions.map(q => {
             if (q.id === questionId) {
@@ -192,27 +175,28 @@ const SurveyPage = () => {
         }));
     };
 
-
     return (
         <div className="survey-page">
             <div className="survey-title">
                 <span>Название анкеты</span>
                 <input type="text" placeholder="название" />
             </div>
-
             {questions.map((question) => (
-                <div className="question-container" key={question.id} id={`question-${question.id}`}
+                <div
+                    className="question-container"
+                    key={question.id}
+                    id={`question-${question.id}`}
                     draggable
-                    onDragStart={() => handleDragStart(question.id)} // Устанавливаем ID перетаскиваемого элемента
-                    onDragOver={handleDragOver} // Разрешаем перетаскивание
-                    onDrop={(e) => handleDrop(e, question.id)} // Отпускаем элемент на целевой позиции
+                    onDragStart={() => handleDragStart(question.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, question.id)}
                 >
                     <div className="question">
                         Тип вопроса
                         <div className="dropdown">
                             <div
                                 className="punkt"
-                                onClick={() => toggleDropdown(question.id)} // Передаём id
+                                onClick={() => setDropdownsOpen({ ...dropdownsOpen, [question.id]: !dropdownsOpen[question.id] })}
                             >
                                 <div
                                     className={`punktGalka ${dropdownsOpen[question.id] ? 'rotate' : ''}`}
@@ -245,9 +229,9 @@ const SurveyPage = () => {
                                     q.id === question.id ? { ...q, text: e.target.value } : q
                                 ))
                             }
-                            id={`question-text-${question.id}`} // Уникальный id для input
+                            id={`question-text-${question.id}`}
                         />
-                        {question.type === "Закрытый" && (
+                        {["Закрытый", "Множественный выбор"].includes(question.type) && (
                             <div>
                                 {question.answers.map((answer) => (
                                     <div key={answer.id} className="answer-container" id={`answer-${answer.id}`}>
@@ -256,80 +240,48 @@ const SurveyPage = () => {
                                             placeholder="ответ"
                                             value={answer.text}
                                             onChange={(e) =>
-                                                updateAnswerText(question.id, answer.id, e.target.value)
+                                                setQuestions(questions.map(q =>
+                                                    q.id === question.id ? {
+                                                        ...q,
+                                                        answers: q.answers.map(a =>
+                                                            a.id === answer.id ? { ...a, text: e.target.value } : a
+                                                        ),
+                                                    } : q
+                                                ))
                                             }
-                                            id={`answer-text-${answer.id}`} // Уникальный id для каждого ответа
+                                            id={`answer-text-${answer.id}`}
                                         />
                                     </div>
                                 ))}
-
                                 <button
                                     className="add-button"
                                     onClick={() => addAnswer(question.id)}
-                                    id={`add-answer-${question.id}`} // Уникальный id для кнопки добавления ответа
+                                    id={`add-answer-${question.id}`}
                                 >
                                     добавить ответ
                                 </button>
-
                                 {question.answers.length > 0 && (
                                     <button
                                         className="delete-button"
                                         onClick={() => deletAnswer(question.id)}
-                                        id={`delete-answer-${question.id}`} // Уникальный id для кнопки удаления ответа
+                                        id={`delete-answer-${question.id}`}
                                     >
                                         удалить ответ
                                     </button>
                                 )}
                             </div>
                         )}
-
-                        {question.type === "Множественный выбор" && (
-                            <div>
-                                {question.answers.map((answer) => (
-                                    <div key={answer.id} className="answer-container" id={`answer-${answer.id}`}>
-                                        <input
-                                            type="text"
-                                            placeholder="ответ"
-                                            value={answer.text}
-                                            onChange={(e) =>
-                                                updateAnswerText(question.id, answer.id, e.target.value)
-                                            }
-                                            id={`answer-text-${answer.id}`} // Уникальный id для каждого ответа
-                                        />
-                                    </div>
-                                ))}
-
-                                <button
-                                    className="add-button"
-                                    onClick={() => addAnswer(question.id)}
-                                    id={`add-answer-${question.id}`} // Уникальный id для кнопки добавления ответа
-                                >
-                                    добавить ответ
-                                </button>
-
-                                {question.answers.length > 0 && (
-                                    <button
-                                        className="delete-button"
-                                        onClick={() => deletAnswer(question.id)}
-                                        id={`delete-answer-${question.id}`} // Уникальный id для кнопки удаления ответа
-                                    >
-                                        удалить ответ
-                                    </button>
-                                )}
-                            </div>
-                        )}
-
                         {question.type === "Шкала" && (
                             <div>
                                 <input
                                     type="text"
                                     placeholder="левое значение шкалы"
-                                    id={`left-scale-${question.id}`} // Уникальный id для левого значения шкалы
+                                    id={`left-scale-${question.id}`}
                                 />
                                 <input
                                     type="text"
                                     placeholder="правое значение шкалы"
-                                    id={`right-scale-${question.id}`} // Уникальный id для правого значения шкалы
+                                    id={`right-scale-${question.id}`}
                                 />
                                 <div style={{ display: "flex", alignItems: "center", gap: "5px", color: "gray", fontSize: "16px" }}>
                                     <label htmlFor={`divisions-${question.id}`} id={`label-divisions-${question.id}`}>
@@ -348,8 +300,6 @@ const SurveyPage = () => {
                                             e.target.value = value;
                                         }}
                                     />
-
-
                                 </div>
                             </div>
                         )}
@@ -360,20 +310,6 @@ const SurveyPage = () => {
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                             </svg>
                             новый блок
-                        </div>
-                        <div className="swap">
-                            <svg
-                                onClick={() => moveQuestionUp(question.id)}
-                                xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-arrow-up" viewBox="0 0 16 16">
-                                <path fillRule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5" />
-                            </svg>
-
-                            <svg
-                                onClick={() => moveQuestionDown(question.id)}
-                                xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-arrow-down" viewBox="0 0 16 16">
-                                <path fillRule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
-                            </svg>
-                            переместить
                         </div>
                         <div className="trash" onClick={() => deleteQuestion(question.id)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
@@ -387,11 +323,14 @@ const SurveyPage = () => {
             ))}
 
             <div className="ButtonSaveContainer">
-                <Link to="/Linkk" className="ButtonSave">Сохранить</Link>
+                <Link to="/Linkk" onClick={handleSave} className="ButtonSave">Сохранить</Link>
+
+                {/* <button onClick={handleSave} className="ButtonSave">
+                    Сохранить
+                </button> */}
             </div>
         </div>
     );
-
 };
 
 export default SurveyPage;

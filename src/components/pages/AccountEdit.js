@@ -1,17 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AccountEdit.css';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../apiContent/apiClient'; // Axios client
 
 function AccountEditPage() {
-    // Состояния для хранения значений полей
-    const [nick, setNick] = useState("Arbuz");
-    const [email, setEmail] = useState("VodilaLifta@mail.ru");
-    const [number, setNumber] = useState("89501236464");
-    const [password, setPassword] = useState("Password");
+    const [nick, setNick] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [initialData, setInitialData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await apiClient.get('/User/current'); // Замените на реальный эндпоинт
+                const userData = response.data;
+    
+                // Убедитесь, что все поля присутствуют
+                setNick(userData.nick || '');
+                setEmail(userData.email || '');
+                setPassword(''); // Пароль обычно не возвращается, оставляем пустым
+                setInitialData({ nick: userData.nick, email: userData.email }); // Сохраняем начальные данные
+                setLoading(false);
+            } catch (error) {
+                console.error('Ошибка при загрузке данных пользователя:', error.response?.data || error.message);
+                setLoading(false);
+            }
+        };
+    
+        fetchUserData();
+    }, []);
+
+    const hasChanges = () => {
+        return (
+            nick !== initialData?.nick ||
+            email !== initialData?.email ||
+            password !== initialData?.password
+        );
+    };
+
+    const handleSave = async () => {
+        if (!hasChanges()) {
+            alert('Нет изменений для сохранения.');
+            return;
+        }
+
+        try {
+            await apiClient.put('/User/update', { nick, email, password });
+            alert('Данные успешно сохранены.');
+            setInitialData({ nick, email, password });
+            navigate('/Account');
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Не удалось сохранить данные.');
+        }
+    };
+
+    if (loading) {
+        return <div>Загрузка...</div>;
+    }
 
     return (
         <div className="acEdit-page">
-            {/* Поле для имени пользователя */}
             <div className="survey-titleLine">
                 <input
                     type="text"
@@ -20,8 +71,6 @@ function AccountEditPage() {
                     onChange={(e) => setNick(e.target.value)}
                 />
             </div>
-
-            {/* Поле для email */}
             <div className="survey-titleLine">
                 <input
                     type="email"
@@ -30,18 +79,6 @@ function AccountEditPage() {
                     onChange={(e) => setEmail(e.target.value)}
                 />
             </div>
-
-            {/* Поле для номера телефона */}
-            <div className="survey-titleLine">
-                <input
-                    type="text"
-                    className="text-line"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
-                />
-            </div>
-
-            {/* Поле для пароля */}
             <div className="survey-titleLine">
                 <input
                     type="password"
@@ -50,12 +87,10 @@ function AccountEditPage() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-
-            {/* Кнопка "Сохранить" */}
             <div className="ButtonSaveContainer">
-                <Link to="/Account" className="ButtonSave">
+                <button className="ButtonSave" onClick={handleSave}>
                     Сохранить
-                </Link>
+                </button>
             </div>
         </div>
     );
