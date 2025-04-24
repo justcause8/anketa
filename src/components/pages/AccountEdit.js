@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AccountEdit.css';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../apiContent/apiClient'; // Axios client
+import apiClient from '../apiContent/apiClient';
 
 function AccountEditPage() {
     const [nick, setNick] = useState('');
@@ -14,14 +14,13 @@ function AccountEditPage() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await apiClient.get('/User/current'); // Замените на реальный эндпоинт
+                const response = await apiClient.get('/User/current');
                 const userData = response.data;
     
-                // Убедитесь, что все поля присутствуют
                 setNick(userData.nick || '');
                 setEmail(userData.email || '');
-                setPassword(''); // Пароль обычно не возвращается, оставляем пустым
-                setInitialData({ nick: userData.nick, email: userData.email }); // Сохраняем начальные данные
+                setPassword(''); 
+                setInitialData({ nick: userData.nick, email: userData.email });
                 setLoading(false);
             } catch (error) {
                 console.error('Ошибка при загрузке данных пользователя:', error.response?.data || error.message);
@@ -64,6 +63,7 @@ function AccountEditPage() {
     return (
         <div className="acEdit-page">
             <div className="survey-titleLine">
+                Имя:
                 <input
                     type="text"
                     className="text-line"
@@ -72,6 +72,7 @@ function AccountEditPage() {
                 />
             </div>
             <div className="survey-titleLine">
+                Почта:
                 <input
                     type="email"
                     className="text-line"
@@ -80,6 +81,7 @@ function AccountEditPage() {
                 />
             </div>
             <div className="survey-titleLine">
+                Пароль:
                 <input
                     type="password"
                     className="text-line"

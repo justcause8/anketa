@@ -2,26 +2,53 @@ import React, { useState } from 'react';
 import apiClient from '../apiContent/apiClient'; // Импортируем API-клиент
 import './ModalReg.css';
 
-const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
+const RegisterModal = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isChecked, setIsChecked] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(''); // Состояние для хранения текста ошибки
 
-    // Функция для обработки регистрации
     const handleRegister = async () => {
-        if (!isChecked) {
-            alert('Пожалуйста, подтвердите согласие на обработку персональных данных.');
+        setError(''); // Очищаем предыдущие ошибки перед новой попыткой регистрации
+
+        // Проверка обязательных полей
+        if (!username || !email || !password || !confirmPassword) {
+            setError('Пожалуйста, заполните все поля.');
             return;
         }
 
-        if (password !== confirmPassword) {
-            alert('Пароли не совпадают.');
+        // Проверка формата email
+        const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!isValidEmail(email)) {
+            setError('Пожалуйста, введите корректный email.');
             return;
         }
+
+        // Проверка длины пароля
+        if (password.length < 2) {
+            setError('Пароль должен содержать минимум 3 символа.');
+            return;
+        }
+
+        // Проверка совпадения паролей
+        if (password !== confirmPassword) {
+            setError('Пароли не совпадают.');
+            return;
+        }
+
+        // Проверка согласия на обработку персональных данных
+        if (!isChecked) {
+            setError('Пожалуйста, подтвердите согласие на обработку персональных данных.');
+            return;
+        }
+
+        setIsLoading(true);
 
         try {
+            // Отправка данных для регистрации
             const response = await apiClient.post('/auth/register', {
                 Username: username,
                 Email: email,
@@ -31,17 +58,20 @@ const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
 
             const { access_token } = response.data;
 
-            // Сохраняем токен в localStorage
+            if (!access_token) {
+                throw new Error("Ответ сервера не содержит токен.");
+            }
+
             localStorage.setItem('access_token', access_token);
 
-            // Уведомляем Navbar об успешной регистрации
             onRegisterSuccess();
 
-            alert('Вы успешно зарегистрировались!');
             onClose(); // Закрываем модальное окно
         } catch (error) {
             console.error('Ошибка регистрации:', error.response?.data || error.message);
-            alert('Ошибка регистрации. Проверьте введенные данные.');
+            setError('Ошибка регистрации. Проверьте введенные данные.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -52,6 +82,7 @@ const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
                     ×
                 </button>
                 <h2>Регистрация</h2>
+
                 <input
                     type="text"
                     placeholder="Имя пользователя"
@@ -76,6 +107,8 @@ const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+                {error && <p className="error-message">{error}</p>}
+
                 <label>
                     <input
                         type="checkbox"
@@ -102,32 +135,35 @@ const ModalReg = ({ onClose, onLoginOpen, onRegisterSuccess }) => {
                     <button
                         type="button"
                         className="link-button"
-                        onClick={() =>
-                            window.open(
-                                'https://avatars.mds.yandex.net/i?id=7f227e472ce817cdad5bb5a582e0e331_l-10340874-images-thumbs&n=13'
-                            )
-                        }
+                        onClick={() => window.open('https://avatars.mds.yandex.net/i?id=7f227e472ce817cdad5bb5a582e0e331_l-10340874-images-thumbs&n=13')}
                     >
                         с политикой конфиденциальности
                     </button>
                 </label>
-                <div className="modal-buttons">
-                    <button className="reg-btn" onClick={handleRegister}>
-                        Зарегистрироваться
+                <div className='modal-buttons'>
+                    <button
+                        className="reg-btn"
+                        onClick={handleRegister}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
                     </button>
                 </div>
-                <label
-                    className="link-button perehod"
-                    onClick={() => {
-                        onClose();
-                        onLoginOpen();
-                    }}
-                >
-                    уже есть аккаунт
-                </label>
+
+                <div className="perehod">
+                    <label
+                        className="link-button"
+                        onClick={() => {
+                            onClose();
+                            onLoginOpen();
+                        }}
+                    >
+                        уже есть аккаунт
+                    </label>
+                </div>
             </div>
         </div>
     );
 };
 
-export default ModalReg;
+export default RegisterModal;

@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import apiClient from '../apiContent/apiClient'; // Импортируем API-клиент
-import './Modal.css';
+import React, { useState, useEffect } from 'react';
+import apiClient from '../apiContent/apiClient';
+import "./Modal.css";
 
-const Modal = ({ onClose, onRegisterOpen, onLoginSuccess }) => {
+const LoginModal = ({ onClose, onRegisterOpen, onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
+    const [error, setError] = useState('');
 
-    // Функция для обработки входа
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('savedEmail');
+        const savedRememberMe = localStorage.getItem('rememberMe');
+
+        if (savedRememberMe === 'true') {
+            setEmail(savedEmail || '');
+            setRememberMe(true);
+        }
+    }, []);
+
     const handleLogin = async () => {
         try {
+            setError('');
             const response = await apiClient.post('/auth/login', {
                 Login: email,
                 Password: password,
@@ -16,18 +28,22 @@ const Modal = ({ onClose, onRegisterOpen, onLoginSuccess }) => {
 
             const { access_token, refresh_token } = response.data;
 
-            // Сохраняем токены в localStorage
             localStorage.setItem('access_token', access_token);
             localStorage.setItem('refresh_token', refresh_token);
 
-            // Уведомляем Navbar об успешном входе
-            onLoginSuccess();
+            if (rememberMe) {
+                localStorage.setItem('savedEmail', email);
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                localStorage.removeItem('savedEmail');
+                localStorage.removeItem('rememberMe');
+            }
 
-            alert('Вы успешно вошли!');
-            onClose(); // Закрываем модальное окно
+            onLoginSuccess();
+            onClose();
         } catch (error) {
             console.error('Ошибка входа:', error.response?.data || error.message);
-            alert('Неверный логин или пароль.');
+            setError('Неверный логин или пароль.');
         }
     };
 
@@ -50,8 +66,13 @@ const Modal = ({ onClose, onRegisterOpen, onLoginSuccess }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
+                {error && <p className="error-message">{error}</p>}
                 <label>
-                    <input type="checkbox" />
+                    <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                    />
                     Запомнить меня
                 </label>
                 <div className="modal-buttons">
@@ -73,4 +94,4 @@ const Modal = ({ onClose, onRegisterOpen, onLoginSuccess }) => {
     );
 };
 
-export default Modal;
+export default LoginModal;

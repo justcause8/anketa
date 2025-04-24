@@ -1,17 +1,39 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 20vh; 
+}
+
+.content {
+    flex: 1; 
+    padding: 20px; 
+}
+
 .footer {
-	background-color: #93aafc;
-	color: white;
-	padding: 60px 0 50px;
-	text-align: center;
+    background-color: #93aafc;
+    color: white;
+    padding: 60px 0 50px;
+    text-align: center;
 }
 
 .footer__wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	row-gap: 27px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 27px;
 }
 
+@media (max-width: 850px) {
+    .footer {
+        padding: 0px 0 50px;
+    }
+}
 @media (max-width: 850px) {
 
 	.footer {

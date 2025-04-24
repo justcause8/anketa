@@ -24,6 +24,7 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // Если получаем статус 401 (Unauthorized), очищаем токены
             localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             alert('Сессия истекла. Пожалуйста, войдите снова.');
         }
         return Promise.reject(error);
@@ -156,6 +157,33 @@ export const getUserProfile = async () => {
     } catch (error) {
         console.error('Ошибка при получении данных пользователя:', error.response?.data || error.message);
         throw error;
+    }
+};
+
+export const checkUsernameAndEmail = async (username, email) => {
+    try {
+        const response = await apiClient.post('/user/check-availability', {
+            Username: username,
+            Email: email,
+        });
+
+        const { isUsernameAvailable, isEmailAvailable } = response.data;
+
+        if (!isUsernameAvailable) {
+            alert('Имя пользователя уже занято.');
+            return false;
+        }
+
+        if (!isEmailAvailable) {
+            alert('Электронная почта уже используется.');
+            return false;
+        }
+
+        return true; // Имя и email доступны
+    } catch (error) {
+        console.error('Ошибка при проверке доступности:', error.response?.data || error.message);
+        alert('Не удалось проверить доступность данных.');
+        return false;
     }
 };
 

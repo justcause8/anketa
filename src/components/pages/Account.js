@@ -1,32 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import './Account.css';
 import setting from './../../img/settings.png';
-import { Pencil, BarChart2, Lock, Unlock, Trash2 } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom';
-import apiClient, { getUserSurveys } from '../apiContent/apiClient'; // Импортируем API-клиент и метод getUserSurveys
-import { getNicknameFromToken } from '../js/authUtils'; // Импортируем функцию для извлечения имени
+import { Pencil, BarChart2, Link, Lock, Unlock, Trash2 } from "lucide-react";
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import apiClient, { getUserSurveys } from '../apiContent/apiClient';
 
-// Компонент для отображения карточки анкеты
-function SurveyCard({ survey, isClosed, onDelete, onEdit }) {
-    const [isHovered, setIsHovered] = useState(false); // Состояние для отслеживания наведения
+function SurveyCard({ survey, isClosed, onDelete, onEdit, onToggleLock }) {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
 
-    // Функция для обрезки текста до maxLength символов
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) return text;
-
         let truncated = text.slice(0, maxLength);
         const lastSpaceIndex = truncated.lastIndexOf(' ');
-
         if (lastSpaceIndex > 0) {
             truncated = truncated.slice(0, lastSpaceIndex);
         }
-
         return `${truncated}...`;
+    };
+
+    const handleDeleteWithConfirmation = () => {
+        setIsModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        onDelete(survey.id);
+        setIsModalOpen(false);
+    };
+
+    const cancelDelete = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleOpenLink = () => {
+        navigate('/Linkk', { state: { link: survey.link } });
     };
 
     return (
         <div
-            className="Open"
+            className="Open relative animate-fade-in"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -35,70 +48,115 @@ function SurveyCard({ survey, isClosed, onDelete, onEdit }) {
                 title={survey.title}
             >
                 {isHovered
-                    ? survey.title.length > 124
-                        ? truncateText(survey.title, 124)
+                    ? survey.title.length > 110
+                        ? truncateText(survey.title, 110)
                         : survey.title
-                    : truncateText(survey.title, 60)}
+                    : truncateText(survey.title, 35)}
             </h2>
             <div className="cursorItems">
                 <div className="left-cursor">
-                    {/* Иконка редактирования */}
                     <Pencil
-                        className="cursor-pointer hover:text-blue-500"
+                        className="cursor-pointer icon-hover"
                         size={24}
-                        onClick={() => onEdit(survey.id)} // Добавляем обработчик
+                        onClick={() => onEdit(survey.id)}
                     />
-                    <BarChart2 className="cursor-pointer hover:text-green-500" size={24} />
+                    <BarChart2
+                        className="cursor-pointer icon-hover"
+                        size={24}
+                        onClick={() => navigate(`/analysis/${survey.id}`)}
+                    />
                     {isClosed ? (
-                        <Lock className="cursor-pointer hover:text-gray-500" size={24} />
+                        <Lock
+                            className="cursor-pointer icon-hover"
+                            size={24}
+                            onClick={() => onToggleLock(survey.id, false)}
+                        />
                     ) : (
-                        <Unlock className="cursor-pointer hover:text-gray-500" size={24} />
+                        <Unlock
+                            className="cursor-pointer icon-hover"
+                            size={24}
+                            onClick={() => onToggleLock(survey.id, true)}
+                        />
                     )}
+                    <Link
+                        className="cursor-pointer icon-hover"
+                        size={24}
+                        onClick={handleOpenLink}
+                    />
                 </div>
                 <div className="right-cursor">
                     <Trash2
-                        className="cursor-pointer hover:text-red-500"
+                        className="cursor-pointer trash-icon-hover"
                         size={24}
-                        onClick={() => onDelete(survey.id)}
+                        onClick={handleDeleteWithConfirmation}
                     />
                 </div>
             </div>
+
+            {isModalOpen && (
+                <div className="modal-card-overlay animate-fade-in-fast" onClick={cancelDelete}>
+                    <div className="modal-card animate-scale-up" onClick={(e) => e.stopPropagation()}>
+                        <h3>Подтверждение удаления</h3>
+                        <p>Вы уверены, что хотите удалить анкету?</p>
+                        <div className="modal-buttons">
+                            <button className="confirm-btn" onClick={confirmDelete}>
+                                Удалить
+                            </button>
+                            <button className="cancel-btn" onClick={cancelDelete}>
+                                Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
-// Основной компонент AccountPage
 function AccountPage() {
-    const [surveys, setSurveys] = useState([]); // Список анкет
-    const [nickname, setNickname] = useState('Гость'); // Никнейм пользователя
-    const navigate = useNavigate(); // Для навигации
+    const [surveys, setSurveys] = useState([]);
+    const [nickname, setNickname] = useState('Гость');
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Получаем список анкет
         const fetchSurveys = async () => {
             try {
-                const userSurveys = await getUserSurveys(); // Используем метод getUserSurveys из apiClient
-                setSurveys(userSurveys); // Устанавливаем данные из бэкенда
+                const userSurveys = await getUserSurveys();
+                setSurveys(userSurveys.map(survey => ({
+                    ...survey,
+                    isClosed: !survey.isPublished
+                })));
             } catch (error) {
                 console.error('Не удалось загрузить анкеты:', error);
             }
         };
 
-        // Получаем никнейм пользователя из токена
-        const fetchNickname = () => {
-            const nickname = getNicknameFromToken(); // Используем функцию из authUtils
-            setNickname(nickname);
+        const fetchUserData = async () => {
+            try {
+                const response = await apiClient.get('/User/current');
+                const userData = response.data;
+                setNickname(userData.nick || 'Гость');
+            } catch (error) {
+                console.error('Ошибка при загрузке данных пользователя:', error.response?.data || error.message);
+                setNickname('Гость');
+            } finally {
+                setLoading(false);
+            }
         };
 
-        fetchSurveys(); // Загружаем анкеты при монтировании компонента
-        fetchNickname(); // Получаем никнейм пользователя
+        fetchSurveys();
+        fetchUserData();
     }, []);
 
-    // Функция для удаления анкеты
     const handleDelete = async (id) => {
+        if (!id) {
+            alert('ID анкеты не указан.');
+            return;
+        }
         try {
-            await apiClient.delete(`/questionnaire/${id}`); // Удаляем анкету на бэкенде
-            const updatedSurveys = surveys.filter((survey) => survey.id !== id); // Удаляем анкету из состояния
+            await apiClient.delete(`/questionnaire/${id}`);
+            const updatedSurveys = surveys.filter((survey) => survey.id !== id);
             setSurveys(updatedSurveys);
         } catch (error) {
             console.error('Ошибка при удалении анкеты:', error.response?.data || error.message);
@@ -106,31 +164,48 @@ function AccountPage() {
         }
     };
 
-    // Функция для редактирования анкеты
     const handleEdit = (id) => {
-        navigate(`/edit-survey/${id}`); // Перенаправляем на страницу редактирования
+        navigate(`/edit-survey/${id}`);
     };
 
-    // Фильтруем анкеты
+    const handleToggleLock = async (id, isClosed) => {
+        try {
+            await apiClient.put(`/questionnaire/${id}/status`, { IsPublished: !isClosed });
+
+            const updatedSurveys = await getUserSurveys();
+            setSurveys(updatedSurveys.map(survey => ({
+                ...survey,
+                isClosed: !survey.isPublished
+            })));
+
+            console.log('Анкеты успешно обновлены:', updatedSurveys);
+        } catch (error) {
+            console.error('Ошибка при изменении статуса анкеты:', error.response?.data || error.message);
+            alert('Не удалось изменить статус анкеты.');
+        }
+    };
+
     const openSurveys = surveys.filter((survey) => !survey.isClosed);
     const closedSurveys = surveys.filter((survey) => survey.isClosed);
 
+    if (loading) {
+        return <div className="ac-page loading-state">Загрузка...</div>;
+    }
+
     return (
         <div className="ac-page">
-            {/* Блок с никнеймом */}
             <div className="Nick">
                 <span>{nickname}</span>
-                <Link to="/AccountEdit">
+                <RouterLink to="/AccountEdit">
                     <img
                         src={setting}
                         alt="setting img"
-                        className="settingImg"
+                        className="settingImg icon-hover"
                         style={{ cursor: 'pointer' }}
                     />
-                </Link>
+                </RouterLink>
             </div>
 
-            {/* Раздел "Открытые" */}
             <div>
                 <div className="type-qw">Открытые</div>
                 <div className="Open-list">
@@ -141,7 +216,8 @@ function AccountPage() {
                                 survey={survey}
                                 isClosed={false}
                                 onDelete={handleDelete}
-                                onEdit={handleEdit} // Передаем функцию редактирования
+                                onEdit={handleEdit}
+                                onToggleLock={handleToggleLock}
                             />
                         ))
                     ) : (
@@ -150,7 +226,6 @@ function AccountPage() {
                 </div>
             </div>
 
-            {/* Раздел "Закрытые" */}
             <div>
                 <div className="type-qw">Закрытые</div>
                 <div className="Open-list">
@@ -161,7 +236,8 @@ function AccountPage() {
                                 survey={survey}
                                 isClosed={true}
                                 onDelete={handleDelete}
-                                onEdit={handleEdit} // Передаем функцию редактирования
+                                onEdit={handleEdit}
+                                onToggleLock={handleToggleLock}
                             />
                         ))
                     ) : (
@@ -173,4 +249,4 @@ function AccountPage() {
     );
 }
 
-export default AccountPage; 
+export default AccountPage;

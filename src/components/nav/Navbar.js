@@ -1,12 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../apiContent/AuthContext';
 import ModalLogin from '../js/Modal';
 import ModalRegister from '../js/ModalReg';
 import BtnDarkMode from '../btnDarkMode/BtnDarkMode';
-import '../header/header.css';
 import logo from './../../img/logo_checklist.png';
-import "./Navbar.css";
+import './Navbar.css';
 
 const Navbar = () => {
     const { isLoggedIn, login, logout } = useContext(AuthContext);
@@ -14,14 +13,18 @@ const Navbar = () => {
     const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
     const [isMenuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);
+    const navigate = useNavigate();
 
+    // Функции для управления модальными окнами
     const openLoginModal = () => setLoginModalOpen(true);
     const closeLoginModal = () => setLoginModalOpen(false);
     const openRegisterModal = () => setRegisterModalOpen(true);
     const closeRegisterModal = () => setRegisterModalOpen(false);
+
+    // Функция для переключения мобильного меню
     const toggleMenu = () => setMenuOpen(!isMenuOpen);
 
-    // Закрытие меню при нажатии вне его
+    // Закрытие меню при клике вне его
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -35,24 +38,42 @@ const Navbar = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+    
+    useEffect(() => {
+        console.log("isLoginModalOpen:", isLoginModalOpen);
+        console.log("isRegisterModalOpen:", isRegisterModalOpen);
+    }, [isLoginModalOpen, isRegisterModalOpen]);
+
+    // Обработчик выхода
+    const handleLogout = () => {
+        logout(); // Вызываем функцию выхода из AuthContext
+        navigate('/Header'); // Перенаправляем на /HEADER
+    };
 
     return (
         <>
             <nav className="nav">
                 <div className="container">
                     <div className="nav-row">
+                        {/* Логотип */}
                         <img src={logo} alt="Project img" className="project__img" />
-                        <NavLink to="/Header" className="logo">
+                        <NavLink to="/HEADER" className="logo">
                             Конструктор
                             <span>анкет</span>
                         </NavLink>
+
+                        {/* Кнопка темной темы */}
                         <BtnDarkMode />
+
+                        {/* Кнопка гамбургера для мобильного меню */}
                         <button className="hamburger" onClick={toggleMenu}>
                             ☰
                         </button>
-                        {/* Применение рефа к меню */}
+
+                        {/* Меню навигации */}
                         <ul ref={menuRef} className={`nav-list ${isMenuOpen ? 'open' : ''}`}>
                             {isLoggedIn ? (
+                                // Если пользователь авторизован
                                 <>
                                     <li className="nav-list__item">
                                         <NavLink to="/Account" className="nav-button">
@@ -60,12 +81,13 @@ const Navbar = () => {
                                         </NavLink>
                                     </li>
                                     <li className="nav-list__item">
-                                        <button onClick={logout} className="nav-button">
+                                        <button onClick={handleLogout} className="nav-button">
                                             Выйти
                                         </button>
                                     </li>
                                 </>
                             ) : (
+                                // Если пользователь не авторизован
                                 <>
                                     <li className="nav-list__item">
                                         <button onClick={openLoginModal} className="nav-button">
@@ -83,6 +105,8 @@ const Navbar = () => {
                     </div>
                 </div>
             </nav>
+
+            {/* Модальное окно для входа */}
             {isLoginModalOpen && (
                 <ModalLogin
                     onClose={closeLoginModal}
@@ -90,6 +114,8 @@ const Navbar = () => {
                     onLoginSuccess={login} // Обновляем состояние после входа
                 />
             )}
+
+            {/* Модальное окно для регистрации */}
             {isRegisterModalOpen && (
                 <ModalRegister
                     onClose={closeRegisterModal}

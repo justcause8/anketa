@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react'; 
+import { AuthContext } from '../apiContent/AuthContext';
 import "./header.css";
 import './reset.css';
 import pictureMain from './../../img/pictureMain.png';
@@ -9,16 +9,38 @@ import Group1 from './../../img/Group1.png';
 import Group2 from './../../img/Group2.png';
 import shkala from './../../img/shkala.png';
 import shema from './../../img/shema.png';
-
+import ModalLogin from '../js/Modal';
+import ModalRegister from '../js/ModalReg';
 
 function Header() {
+    const { isLoggedIn, login } = useContext(AuthContext);
+    const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+    const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false); 
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
+
+    const openLoginModal = () => setLoginModalOpen(true);
+    const closeLoginModal = () => setLoginModalOpen(false);
+    const openRegisterModal = () => setRegisterModalOpen(true);
+    const closeRegisterModal = () => setRegisterModalOpen(false);
+
+    const handleCreateClick = () => {
+        if (!isLoggedIn) {
+            openLoginModal();
+        } else {
+            window.location.href = "/create";
+        }
+    };
+
+    const loadClass = isLoaded ? 'loaded' : '';
+
     return (
         <>
-
-            <header className="header1">
-
+            <header className={`header1 ${loadClass}`}>
                 <div className="header__wrapper">
-
                     <h1 className="header__title span">
                         <div className='desktop-only'>
                             <span>Начните</span>
@@ -27,24 +49,27 @@ function Header() {
                             <span>прямо сейчас</span>
                         </div>
                         <div className='mobile-only'>
-                            <span >Начните создавать</span>
-                            <span >свои анкеты</span>
-                            <span >прямо сейчас</span>
+                            <span>Начните создавать</span>
+                            <span>свои анкеты</span>
+                            <span>прямо сейчас</span>
                         </div>
                     </h1>
-                    <Link to="/create" className="btn">Создать анкету</Link>
+                    <button onClick={handleCreateClick} className="btn">
+                        Создать анкету
+                    </button>
                 </div>
                 <img src={pictureMain} alt="Project img" className="imgMain" />
                 <img src={imgMain2} alt="Project img" className="imgMain2" />
-                <Link to="/create" className="btn2">Создать анкету</Link>
+                <button onClick={handleCreateClick} className="btn2">
+                    Создать анкету
+                </button>
             </header>
 
-            <main className="section">
+            <main className={`section ${loadClass}`} style={{ animationDelay: '0.2s' }}>
                 <div className="containerBlock2">
                     <div className="content-wrapper">
                         <ul className="content-list">
                             <div className="instruction-text">
-
                                 <div className='mobile_instruction'>
                                     <span>Используйте разные</span>
                                     <span>виды ответов</span>
@@ -73,32 +98,42 @@ function Header() {
                                 <img src={shkala} alt="Project img" className="imgShkala" />
                             </li>
                         </ul>
-                        <div className="instruction-text">
-                            <div className='desktop_instruction'>
-                                Используйте<br />
-                                разные виды<br />
-                                ответов
-                            </div>
+                        <div className="instruction-text desktop_instruction"> 
+                            Используйте<br />
+                            разные виды<br />
+                            ответов
                         </div>
                     </div>
                 </div>
             </main>
 
-            <section className="section_view">
+            <section className={`section_view ${loadClass}`} style={{ animationDelay: '0.4s' }}> 
                 <div className="shema__container">
-
                     <div className="shema__title">
                         <span>Просматривайте</span>
                         <span>ответы в удобном</span>
                         <span>формате</span>
                     </div>
-
                 </div>
-
                 <img src={shema} alt="Shema img" className="imgShema" />
-
             </section>
 
+            {/* Модальные окна */}
+            {isLoginModalOpen && (
+                <ModalLogin
+                    onClose={closeLoginModal}
+                    onRegisterOpen={openRegisterModal}
+                    onLoginSuccess={login}
+                />
+            )}
+
+            {isRegisterModalOpen && (
+                <ModalRegister
+                    onClose={closeRegisterModal}
+                    onLoginOpen={openLoginModal}
+                    onRegisterSuccess={login}
+                />
+            )}
         </>
     );
 }

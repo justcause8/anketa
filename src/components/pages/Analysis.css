@@ -1,0 +1,190 @@
+.analysis-page {
+    padding: 30px;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #f4f7f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+.analysis-title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+.analysis-description {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #555;
+    font-size: 1.1em;
+}
+.users-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.user-block {
+    border: none;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    transition: box-shadow 0.3s ease;
+    overflow: hidden;
+}
+.user-block:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 15px 20px;
+    background-color: #e8f0f7;
+    border-bottom: 1px solid #d5e3ec;
+    transition: background-color 0.3s ease;
+}
+.user-block.expanded .user-header {
+    background-color: #dce9f5;
+}
+.user-header:hover {
+    background-color: #dce9f5;
+}
+.user-name {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #34495e;
+}
+.toggle-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #34495e;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transform-origin: center;
+}
+.user-block.expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+.user-answers-wrapper {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.6s ease-in-out, opacity 0.5s ease-in;
+}
+.user-block.expanded .user-answers-wrapper {
+    max-height: 1500px;
+    opacity: 1;
+    transition: max-height 0.6s ease-in-out, opacity 0.6s 0.1s ease-out;
+}
+.user-answers {
+    padding: 15px 20px 20px 20px;
+    background-color: #fdfdfd;
+}
+.answer-item {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+.answer-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.answer-question {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+.answer-text {
+    margin: 0 0 5px 0;
+    color: #333;
+    line-height: 1.5;
+    padding-left: 10px;
+    border-left: 3px solid #3498db;
+    background-color: #f8f9fa;
+    padding: 8px 10px 8px 15px;
+    border-radius: 4px;
+    word-wrap: break-word;
+}
+.answer-text.no-answer {
+    color: #888;
+    border-left-color: #ccc;
+    background-color: transparent;
+    padding: 0;
+    border-left: none;
+    font-style: italic;
+}
+.user-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    padding: 10px 20px;
+    background-color: #f8f9f9;
+    border-top: 1px solid #e5e8eb;
+}
+
+.user-last-answered {
+    color: #6c757d;
+    font-size: 0.85em;
+}
+.no-answers-block {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    color: #777;
+    font-size: 1.1em;
+    margin-top: 20px;
+}
+.loading-spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    color: #555;
+}
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@media (max-width: 600px) {
+    .analysis-page {
+        padding: 20px 15px;
+    }
+    .analysis-title {
+        font-size: 1.8em;
+    }
+    .user-header {
+        padding: 12px 15px;
+    }
+    .user-name {
+        font-size: 1.1em;
+    }
+    .user-answers {
+        padding: 15px;
+    }
+    .user-footer {
+        padding: 8px 15px;
+    }
+    .user-last-answered {
+        font-size: 0.8em;
+    }
+}
