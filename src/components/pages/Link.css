@@ -11,11 +11,12 @@ body {
 .page-container {
     display: flex;
     flex-direction: column;
-    min-height: 10vh;
     padding: 20px;
-    padding-bottom: 200px;
+    /* padding-bottom: 200px; */
     box-sizing: border-box;
     overflow-x: hidden; 
+    min-height: 78.9vh;
+
 }
 
 @keyframes cardEnter {
@@ -143,7 +144,6 @@ body {
 }
 
 .copy-popup {
-    position: fixed;
     background: #4caf50;
     color: white;
     padding: 10px 15px;
@@ -189,6 +189,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    
 }
 
 .modal-overlay-link.visible {
@@ -196,7 +197,7 @@ body {
     visibility: visible;
 }
 
-.modal-content {
+.modal-content-qr {
     background-color: #fff;
     padding: 30px;
     border-radius: 12px;
@@ -211,12 +212,12 @@ body {
     transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease;
 }
 
-.modal-overlay-link.visible .modal-content {
+.modal-overlay-link.visible .modal-content-qr {
     transform: scale(1) translateY(0);
     opacity: 1;
 }
 
-.modal-content h3 {
+.modal-content-qr h3 {
     margin-top: 0;
     margin-bottom: 25px;
     font-size: 20px;
@@ -231,6 +232,8 @@ body {
     padding: 10px;
     border-radius: 8px;
     background-color: #fdfdfd;
+    display: flex;
+    justify-content: center;
 }
 
 .qr-image {
@@ -306,6 +309,9 @@ body {
 
 
 @media (max-width: 991.98px) {
+    .page-container{
+        min-height: 81.2vh;
+    }
     .survey-pageLink {
          max-width: 75%;
         padding: 25px 30px;
@@ -367,10 +373,10 @@ body {
     .Arrow {
         width: 18px;
     }
-     .modal-content {
+     .modal-content-qr {
         padding: 20px;
     }
-     .modal-content h3 {
+     .modal-content-qr h3 {
         font-size: 18px;
         margin-bottom: 20px;
     }
@@ -420,11 +426,11 @@ body {
     .Arrow {
         width: 16px;
     }
-     .modal-content {
+     .modal-content-qr {
         width: 95%;
         padding: 15px;
     }
-     .modal-content h3 {
+     .modal-content-qr h3 {
         font-size: 16px;
     }
     .qr-image {

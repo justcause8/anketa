@@ -1,11 +1,15 @@
+
 .Thk-container {
+    /* flex: 1;  */
+
     display: flex;
     flex-direction: column;
-    min-height: 80vh;
+    min-height: 78.9vh;
     justify-content: center;
     align-items: center;
     padding: 20px;
     overflow: hidden;
+    
 }
 
 .survey-pageThk {
@@ -94,6 +98,9 @@
 }
 
 @media (max-width: 1024px) {
+    .Thk-container {
+        min-height: 81.2vh;
+    }
     .survey-pageThk {
         max-width: 75%;
         padding: 35px 60px;
@@ -112,6 +119,9 @@
 }
 
 @media (max-width: 768px) {
+    .Thk-container {
+        min-height: 82.2vh;
+    }
     .survey-pageThk {
         max-width: 90%;
         padding: 30px 40px;
@@ -138,6 +148,7 @@
 
 @media (max-width: 480px) {
     .Thk-container {
+        min-height: 81.2vh;
         padding: 15px;
     }
     .survey-pageThk {

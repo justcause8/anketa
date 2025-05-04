@@ -1,3 +1,6 @@
+.acEdit-page-vh{
+    min-height: 73.3vh;
+}
 .acEdit-page {
     font-family: Arial, sans-serif;
     padding: 40px;
@@ -109,6 +112,9 @@
 }
 
 @media (max-width: 767.98px) {
+    .acEdit-page-vh{
+        min-height: 75.9vh;
+    }
     .acEdit-page {
         max-width: 95%;
         padding: 20px;
@@ -133,6 +139,9 @@
 }
 
 @media (max-width: 575.98px) {
+    .acEdit-page-vh{
+        min-height: 78.4vh;
+    }
     .acEdit-page {
         padding: 15px;
         margin-top: 30px;

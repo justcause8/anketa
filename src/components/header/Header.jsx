@@ -54,7 +54,7 @@ function Header() {
                             <span>прямо сейчас</span>
                         </div>
                     </h1>
-                    <button onClick={handleCreateClick} className="btn">
+                    <button onClick={handleCreateClick} className="btn-create">
                         Создать анкету
                     </button>
                 </div>

@@ -1,3 +1,6 @@
+.survey-page-vh{
+    min-height: 73.4vh;
+}
 .survey-page {
     font-family: Arial, sans-serif;
     padding: 20px;
@@ -209,7 +212,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
-    padding: 15px 20px;
+    padding: 25px 20px;
     background: #e9ecf8;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -368,6 +371,9 @@
   40%, 80% { transform: translateX(4px); }
 }
 @media (max-width: 1024px) {
+    .survey-page-vh{
+        min-height: 75vh;
+    }
     .survey-page {
         max-width: 85%;
         margin-top: 40px;
@@ -383,6 +389,9 @@
     }
 }
 @media (max-width: 768px) {
+    .survey-page-vh{
+        min-height: 78vh;
+    }
     .survey-page {
         max-width: 95%;
         padding: 15px;
@@ -456,6 +465,9 @@
     }
 }
 @media (max-width: 480px) {
+    .survey-page-vh{
+        min-height: 80vh;
+    }
     .survey-page {
         max-width: 100%;
         border-radius: 0;

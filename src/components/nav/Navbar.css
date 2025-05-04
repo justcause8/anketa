@@ -45,14 +45,17 @@
     font-size: 16px;
     font-weight: 500;
     font-family: 'Poppins', sans-serif;
+    
 }
+
 
 /* Элементы навигации */
 .nav-list__item {
     font-size: 30px;
-
 }
-
+.nav-list__item:last-child {
+    margin-right: 100px;
+}
 /* Ссылки навигации */
 .nav-list__link {
     color: var(--black);
@@ -318,9 +321,11 @@
     background: none;
     border: none;
     cursor: pointer;
-    
+    padding-right: 40px;
+
     color: var(--dark-color);
 }
+
 
 .nav-list {
     display: flex;

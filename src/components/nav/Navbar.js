@@ -38,7 +38,7 @@ const Navbar = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-    
+
     useEffect(() => {
         console.log("isLoginModalOpen:", isLoginModalOpen);
         console.log("isRegisterModalOpen:", isRegisterModalOpen);
@@ -63,7 +63,7 @@ const Navbar = () => {
                         </NavLink>
 
                         {/* Кнопка темной темы */}
-                        <BtnDarkMode />
+                        {/* <BtnDarkMode /> */}
 
                         {/* Кнопка гамбургера для мобильного меню */}
                         <button className="hamburger" onClick={toggleMenu}>
@@ -76,12 +76,12 @@ const Navbar = () => {
                                 // Если пользователь авторизован
                                 <>
                                     <li className="nav-list__item">
-                                        <NavLink to="/Account" className="nav-button">
+                                        <button onClick={() => { navigate('/Account'); setMenuOpen(false); }} className="nav-button">
                                             Личный кабинет
-                                        </NavLink>
+                                        </button>
                                     </li>
                                     <li className="nav-list__item">
-                                        <button onClick={handleLogout} className="nav-button">
+                                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="nav-button">
                                             Выйти
                                         </button>
                                     </li>
@@ -90,12 +90,12 @@ const Navbar = () => {
                                 // Если пользователь не авторизован
                                 <>
                                     <li className="nav-list__item">
-                                        <button onClick={openLoginModal} className="nav-button">
+                                        <button onClick={() => { openLoginModal(); setMenuOpen(false); }} className="nav-button">
                                             Войти
                                         </button>
                                     </li>
                                     <li className="nav-list__item">
-                                        <button onClick={openRegisterModal} className="nav-button">
+                                        <button onClick={() => { openRegisterModal(); setMenuOpen(false); }} className="nav-button">
                                             Регистрация
                                         </button>
                                     </li>

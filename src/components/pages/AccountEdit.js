@@ -10,16 +10,16 @@ function AccountEditPage() {
     const [initialData, setInitialData] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await apiClient.get('/User/current');
                 const userData = response.data;
-    
+
                 setNick(userData.nick || '');
                 setEmail(userData.email || '');
-                setPassword(''); 
+                setPassword('');
                 setInitialData({ nick: userData.nick, email: userData.email });
                 setLoading(false);
             } catch (error) {
@@ -27,7 +27,7 @@ function AccountEditPage() {
                 setLoading(false);
             }
         };
-    
+
         fetchUserData();
     }, []);
 
@@ -61,38 +61,40 @@ function AccountEditPage() {
     }
 
     return (
-        <div className="acEdit-page">
-            <div className="survey-titleLine">
-                Имя:
-                <input
-                    type="text"
-                    className="text-line"
-                    value={nick}
-                    onChange={(e) => setNick(e.target.value)}
-                />
-            </div>
-            <div className="survey-titleLine">
-                Почта:
-                <input
-                    type="email"
-                    className="text-line"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </div>
-            <div className="survey-titleLine">
-                Пароль:
-                <input
-                    type="password"
-                    className="text-line"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-            </div>
-            <div className="ButtonSaveContainer">
-                <button className="ButtonSave" onClick={handleSave}>
-                    Сохранить
-                </button>
+        <div className="acEdit-page-vh">
+            <div className="acEdit-page">
+                <div className="survey-titleLine">
+                    Имя:
+                    <input
+                        type="text"
+                        className="text-line"
+                        value={nick}
+                        onChange={(e) => setNick(e.target.value)}
+                    />
+                </div>
+                <div className="survey-titleLine">
+                    Почта:
+                    <input
+                        type="email"
+                        className="text-line"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <div className="survey-titleLine">
+                    Пароль:
+                    <input
+                        type="password"
+                        className="text-line"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+                <div className="ButtonSaveContainer">
+                    <button className="ButtonSave" onClick={handleSave}>
+                        Сохранить
+                    </button>
+                </div>
             </div>
         </div>
     );

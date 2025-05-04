@@ -193,56 +193,58 @@ function AccountPage() {
     }
 
     return (
-        <div className="ac-page">
-            <div className="Nick">
-                <span>{nickname}</span>
-                <RouterLink to="/AccountEdit">
-                    <img
-                        src={setting}
-                        alt="setting img"
-                        className="settingImg icon-hover"
-                        style={{ cursor: 'pointer' }}
-                    />
-                </RouterLink>
-            </div>
-
-            <div>
-                <div className="type-qw">Открытые</div>
-                <div className="Open-list">
-                    {openSurveys.length > 0 ? (
-                        openSurveys.map((survey) => (
-                            <SurveyCard
-                                key={survey.id}
-                                survey={survey}
-                                isClosed={false}
-                                onDelete={handleDelete}
-                                onEdit={handleEdit}
-                                onToggleLock={handleToggleLock}
-                            />
-                        ))
-                    ) : (
-                        <p className="no-surveys">Нет открытых анкет</p>
-                    )}
+        <div className="list-ancet">
+            <div className="ac-page">
+                <div className="Nick">
+                    <span>{nickname}</span>
+                    <RouterLink to="/AccountEdit">
+                        <img
+                            src={setting}
+                            alt="setting img"
+                            className="settingImg icon-hover"
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </RouterLink>
                 </div>
-            </div>
 
-            <div>
-                <div className="type-qw">Закрытые</div>
-                <div className="Open-list">
-                    {closedSurveys.length > 0 ? (
-                        closedSurveys.map((survey) => (
-                            <SurveyCard
-                                key={survey.id}
-                                survey={survey}
-                                isClosed={true}
-                                onDelete={handleDelete}
-                                onEdit={handleEdit}
-                                onToggleLock={handleToggleLock}
-                            />
-                        ))
-                    ) : (
-                        <p className="no-surveys">Нет закрытых анкет</p>
-                    )}
+                <div>
+                    <div className="type-qw">Открытые</div>
+                    <div className="Open-list">
+                        {openSurveys.length > 0 ? (
+                            openSurveys.map((survey) => (
+                                <SurveyCard
+                                    key={survey.id}
+                                    survey={survey}
+                                    isClosed={false}
+                                    onDelete={handleDelete}
+                                    onEdit={handleEdit}
+                                    onToggleLock={handleToggleLock}
+                                />
+                            ))
+                        ) : (
+                            <p className="no-surveys">Нет открытых анкет</p>
+                        )}
+                    </div>
+                </div>
+
+                <div>
+                    <div className="type-qw">Закрытые</div>
+                    <div className="Open-list">
+                        {closedSurveys.length > 0 ? (
+                            closedSurveys.map((survey) => (
+                                <SurveyCard
+                                    key={survey.id}
+                                    survey={survey}
+                                    isClosed={true}
+                                    onDelete={handleDelete}
+                                    onEdit={handleEdit}
+                                    onToggleLock={handleToggleLock}
+                                />
+                            ))
+                        ) : (
+                            <p className="no-surveys">Нет закрытых анкет</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

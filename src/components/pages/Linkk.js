@@ -119,7 +119,7 @@ function LinkQuestionnairePage() {
                             title="Показать QR-код" 
                             className="QRButton icon-button"
                             onClick={() => setIsModalOpen(true)} 
-                        />
+                        /> 
                         <img
                             src={Copy}
                             alt="Копировать ссылку"
@@ -136,7 +136,7 @@ function LinkQuestionnairePage() {
                         onClick={closeModal} 
                     >
                         <div
-                            className={`modal-content ${isModalVisible ? 'visible' : ''}`}
+                            className={`modal-content-qr ${isModalVisible ? 'visible' : ''}`}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <span className="close-modal" onClick={closeModal}>

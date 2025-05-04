@@ -1,3 +1,6 @@
+.list-ancet{
+    min-height: 73.3vh;
+}
 .ac-page {
     font-family: Arial, sans-serif;
     padding: 60px 20px 20px;
@@ -47,6 +50,7 @@
     line-height: 35.55px;
     letter-spacing: 0%;
     padding: 50px 20px 20px 20px;
+    
 }
 
 .Open-list {
@@ -250,6 +254,9 @@
 }
 
 @media (max-width: 1200px) {
+    .list-ancet{
+        min-height: 73.4vh; 
+    }
     .ac-page {
         max-width: 80%;
     }
@@ -259,6 +266,9 @@
 }
 
 @media (max-width: 768px) {
+    .list-ancet{
+        min-height: 78vh; 
+    }
     .ac-page {
         max-width: 95%;
         padding: 40px 15px 15px;
@@ -300,6 +310,9 @@
 }
 
 @media (max-width: 480px) {
+    .list-ancet{
+        min-height: 79vh; 
+    }
     .ac-page {
         padding: 30px 10px 10px;
         margin-top: 20px;
