@@ -1,5 +1,6 @@
 import "./components/header/header.css";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import CreaturePage from "./components/pages/create";
 import Header from './components/header/Header';
 import Navbar from "./components/nav/Navbar";
