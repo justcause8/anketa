@@ -18,8 +18,8 @@ function App() {
   return (
     <AuthProvider>
       <div className="App">
-        <Router>
-          <Navbar />
+      <Router basename="/anketa">
+        <Navbar />
 
           <Routes>
             <Route path="/" element={<Navigate to="/Header" replace />} />
