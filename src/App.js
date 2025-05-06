@@ -17,11 +17,11 @@ function App() {
   return (
     <AuthProvider>
       <div className="App">
-        <Router basename="/Header">
+        <Router basename="/anketa">
           <Navbar />
 
           <Routes>
-            <Route path="/" element={<Header />} />
+            <Route path="/" element={<Navigate to="/Header" replace />} />
             <Route path="/Header" element={<Header />} />
             <Route path="/create" element={<CreaturePage />} />
             <Route path="/Linkk" element={<LinkQuestionnairePage />} />
