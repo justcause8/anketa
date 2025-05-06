@@ -17,7 +17,7 @@ function App() {
   return (
     <AuthProvider>
       <div className="App">
-        <Router>
+        <Router basename="/anketa">
           <Navbar />
 
           <Routes>
