@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'; 
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../apiContent/AuthContext';
 import "./header.css";
 import './reset.css';
@@ -27,11 +28,13 @@ function Header() {
     const openRegisterModal = () => setRegisterModalOpen(true);
     const closeRegisterModal = () => setRegisterModalOpen(false);
 
+    const navigate = useNavigate();
+
     const handleCreateClick = () => {
         if (!isLoggedIn) {
             openLoginModal();
         } else {
-            window.location.href = "/create";
+            navigate('/Create');
         }
     };
 

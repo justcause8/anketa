@@ -1,6 +1,5 @@
 import "./components/header/header.css";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import CreaturePage from "./components/pages/create";
 import Header from './components/header/Header';
 import Navbar from "./components/nav/Navbar";
@@ -18,22 +17,21 @@ function App() {
   return (
     <AuthProvider>
       <div className="App">
-      <Router basename="/anketa">
-        <Navbar />
+        <Router>
+          <Navbar />
 
           <Routes>
-            <Route path="/" element={<Navigate to="/Header" replace />} />
+            <Route path="/" element={<Header />} />
             <Route path="/Header" element={<Header />} />
-            <Route path="/create" element={<CreaturePage />} />
+            <Route path="/Create" element={<CreaturePage />} />
             <Route path="/Linkk" element={<LinkQuestionnairePage />} />
-            {/* <Route path="/Answers" element={<AnswersPage />} /> */}
+            <Route path="/Answers" element={<AnswersPage />} />
             <Route path="/Answers/:id" element={<AnswersPage />} />
             <Route path="/Account" element={<AccountPage />} />
             <Route path="/AccountEdit" element={<AccountEditPage />} />
             <Route path="/edit-survey/:id" element={<EditSurveyPage />} />
             <Route path="/Thk" element={<ThkPage />} />
             <Route path="/Analysis/:id" element={<AnalysisPage />} />
-
           </Routes>
 
           <Footer />

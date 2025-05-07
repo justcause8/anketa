@@ -363,7 +363,7 @@ const SurveyPage = () => {
         }
         setDraggedId(null);
         setDragOverId(null);
-    }, [draggedId, draggedIndex, questionIndices]);
+    }, [draggedId, draggedIndex, questionIndices, dragOverId]);
 
     const handleDragEnd = useCallback(() => {
 
