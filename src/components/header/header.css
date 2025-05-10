@@ -520,7 +520,7 @@ body {
 		padding-left: 200px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 15px 80px;
 		font-size: 32px;
 	}
@@ -574,7 +574,7 @@ body {
 		padding-bottom: 70px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 12px 65px;
 		font-size: 30px;
 	}
@@ -671,7 +671,7 @@ body {
 		padding-bottom: 30px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 11px 60px;
 		font-size: 25px;
 	}
@@ -744,7 +744,7 @@ body {
 		padding-right: 0px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 11px 45px;
 		font-size: 20px;
 	}
@@ -789,7 +789,7 @@ body {
 		max-width: 270px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 9px 30px;
 		font-size: 15px;
 	}
@@ -829,7 +829,7 @@ body {
 		margin-top: 0px;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 8px 18px;
 		font-size: 12px;
 		margin-top: 0px;
@@ -869,7 +869,7 @@ body {
 		margin-right: auto;
 	}
 
-	.btn {
+	.btn-create {
 		padding: 8px 18px;
 		font-size: 12px;
 		margin-top: 0px;
@@ -900,6 +900,7 @@ body {
 }
 
 @media (max-width: 580px) {
+
 	.header1 {
 		padding-left: 70px;
 	}
@@ -961,6 +962,9 @@ body {
 }
 
 @media (max-width: 470px) {
+	.btn-create{
+		display:none;
+	}
 	.header1 {
 		padding-left: 70px;
 	}
@@ -1002,6 +1006,9 @@ body {
 
 
 @media (max-width: 450px) {
+	.btn-create{
+		display:none;
+	}
 	.desktop-only {
 		display: none;
 	}
