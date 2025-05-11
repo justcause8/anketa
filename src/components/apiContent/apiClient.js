@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Создаем экземпляр axios с базовым URL бэкенда
 const apiClient = axios.create({
-    baseURL: 'https://localhost:7109', // Базовый URL вашего бэкенда
+    // baseURL: 'https://localhost:7109', // Базовый URL вашего бэкенда
+    baseURL: 'https://5.129.207.189',
     headers: {
         'Content-Type': 'application/json',
     },
