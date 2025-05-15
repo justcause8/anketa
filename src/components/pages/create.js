@@ -28,6 +28,7 @@ const SurveyPage = () => {
     const [error, setError] = useState("");
     const [questionErrors, setQuestionErrors] = useState({});
     const [deleteError, setDeleteError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const options = ["Открытый", "Закрытый", "Множественный выбор", "Шкала", "Выпадающий список"];
     const questionRefs = useRef({});
@@ -110,45 +111,51 @@ const SurveyPage = () => {
     };
 
     const handleSave = async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+
         try {
             setError("");
             setQuestionErrors({});
+
             if (!title.trim()) {
                 setError("Название анкеты должно быть заполнено");
+                setIsLoading(false);
                 return;
             }
-            if (!validateQuestions()) {
-                return;
-            }
-            const questionsToSave = questions.filter(q => !q.isDeleting);
 
+            if (!validateQuestions()) {
+                setIsLoading(false);
+                return;
+            }
+
+            const questionsToSave = questions.filter(q => !q.isDeleting);
 
             const formattedQuestions = questionsToSave.map((question) => {
                 const cleanQuestion = { ...question, animationState: null };
                 if (cleanQuestion.type === "Шкала") {
-
                     const scaleText = `${cleanQuestion.leftScaleValue || ""}|${cleanQuestion.rightScaleValue || ""}|${cleanQuestion.divisions || 5}`;
-
                     return { ...cleanQuestion, text: `${cleanQuestion.text || ''}|${scaleText}` };
                 }
-
                 return cleanQuestion;
             });
-
 
             const response = await apiClient.post('/questionnaire/create', { Title: title });
             const questionnaireId = response.data.questionnaireId;
             const link = response.data.link;
-
 
             for (const question of formattedQuestions.sort((a, b) => a.displayId - b.displayId)) {
                 await addQuestionApi(questionnaireId, question);
             }
 
             navigate("/Linkk", { state: { link } });
+
         } catch (error) {
             console.error('Ошибка при сохранении анкеты:', error.response?.data || error.message);
             setError(`Ошибка при сохранении анкеты: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -363,7 +370,7 @@ const SurveyPage = () => {
         }
         setDraggedId(null);
         setDragOverId(null);
-    }, [draggedId, draggedIndex, questionIndices, dragOverId]);
+    }, [draggedId, draggedIndex, questionIndices]);
 
     const handleDragEnd = useCallback(() => {
 
@@ -900,8 +907,9 @@ const SurveyPage = () => {
                         onClick={handleSave}
                         className="ButtonSave"
                         type="button"
+                        disabled={isLoading}
                     >
-                        Сохранить
+                        {isLoading ? 'Отправка...' : 'Сохранить'}
                     </button>
                 </div>
             </div>

@@ -147,6 +147,24 @@
     color: var(--white);
 }
 
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #42d837;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+    from { top: -50px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}
+
 @media (max-width: 1715px) {
     .container {
         padding-left: 100px;
@@ -364,6 +382,3 @@
     }
 	
 }
-
-
-

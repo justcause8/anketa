@@ -31,6 +31,27 @@ if (typeof window !== 'undefined') {
     Modal.setAppElement('#root');
 }
 
+const generateCheckboxBarLegendLabels = (chart) => {
+    const data = chart.data;
+    if (data.labels && data.labels.length && data.datasets.length && data.datasets[0].data) {
+        return data.labels.map((label, i) => {
+            const meta = chart.getDatasetMeta(0);
+            const style = meta.controller.getStyle(i);
+            const labelText = Array.isArray(label) ? label.join(' ') : String(label);
+            return {
+                text: labelText,
+                fillStyle: style.backgroundColor,
+                strokeStyle: style.borderColor,
+                lineWidth: style.borderWidth,
+                hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                index: i,
+            };
+        });
+    }
+    return [];
+};
+
+
 function ScoreWheel({ score, size = 60, strokeWidth = 5 }) {
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
@@ -86,19 +107,48 @@ function RenderChartForExport({ chartId, chartData, chartTitle, chartRefs }) {
         return null;
     }
     const ChartComponent = (chartData.labels.length <= 5 && chartData.questionType !== 'checkbox') ? Doughnut : Bar;
+    const isCheckboxBar = ChartComponent === Bar && chartData.questionType === 'checkbox';
+
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: true,
         plugins: {
-            legend: { position: 'top', display: true },
-            title: { display: true, text: chartTitle, font: { size: 14 } },
+            legend: {
+                position: 'top',
+                display: true,
+                labels: isCheckboxBar ? { generateLabels: generateCheckboxBarLegendLabels, boxWidth: 12, padding:15 } : {boxWidth: 12, padding:15},
+            },
+            title: { display: true, text: chartTitle, font: { size: 16, weight: 'bold' }, padding: { top: 5, bottom: isCheckboxBar ? 5: 15} },
             tooltip: { enabled: false }
         },
-        scales: ChartComponent === Bar ? { y: { beginAtZero: true, ticks: { precision: 0 } } } : undefined,
+        scales: ChartComponent === Bar ? {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+            },
+            x: {
+                ticks: {
+                    display: !isCheckboxBar,
+                    autoSkip: false,
+                    maxRotation: (chartData.labels && chartData.labels.length > 7 && !isCheckboxBar ? 30 : 0),
+                    minRotation: (chartData.labels && chartData.labels.length > 7 && !isCheckboxBar ? 30 : 0),
+                    font: {
+                        size: (chartData.labels && chartData.labels.length > 10 && !isCheckboxBar ? 8 : 9)
+                    },
+                }
+            }
+        } : undefined,
         animation: false
     };
     const setRef = (el) => { if (el && chartRefs) { chartRefs.current[chartId] = el; } };
-    const containerHeight = ChartComponent === Doughnut ? '400px' : '350px';
+
+    let containerHeight = ChartComponent === Doughnut ? '400px' : '350px';
+     if (ChartComponent === Bar && chartData.labels) {
+        const numLabels = chartData.labels.length;
+        const numLinesPerLabelMax = isCheckboxBar ? 1 : chartData.labels.reduce((max, labelArray) => Math.max(max, Array.isArray(labelArray) ? labelArray.length : 1), 1);
+        const calculatedHeight = 150 + (isCheckboxBar ? (numLabels * 8) : (numLabels * (20 + numLinesPerLabelMax * 5))) + (numLinesPerLabelMax * 12);
+        containerHeight = `${Math.max(350, Math.min(800, calculatedHeight))}px`;
+    }
     const containerPadding = '20px';
 
     return (
@@ -154,6 +204,93 @@ function AnalysisPage() {
         isLoading: false,
         error: null,
     });
+
+    function formatLabelsForChartJS(originalLabel, idealLineLength = 20, maxLinesCount = 3) {
+        if (typeof originalLabel !== 'string') {
+            return [String(originalLabel)];
+        }
+        originalLabel = originalLabel.trim();
+        if (!originalLabel) return [''];
+
+        const words = originalLabel.split(' ');
+        const lines = [];
+        let currentLine = '';
+
+        for (const word of words) {
+            if (lines.length === maxLinesCount) {
+                if (lines.length > 0 && !lines[lines.length - 1].endsWith('...')) {
+                    const lastIdx = lines.length - 1;
+                    const currentLastLine = lines[lastIdx];
+                    if (currentLastLine.length + 3 > idealLineLength && idealLineLength > 3) {
+                         lines[lastIdx] = currentLastLine.substring(0, idealLineLength - 3) + '...';
+                    } else if (currentLastLine.length < idealLineLength) {
+                         lines[lastIdx] = currentLastLine + '...';
+                    }
+                }
+                currentLine = '';
+                break;
+            }
+
+            const potentialLine = currentLine === '' ? word : currentLine + ' ' + word;
+
+            if (potentialLine.length <= idealLineLength) {
+                currentLine = potentialLine;
+            } else {
+                if (currentLine !== '') {
+                    lines.push(currentLine);
+                    if (lines.length === maxLinesCount) {
+                        if (!lines[lines.length - 1].endsWith('...')) {
+                             const lastIdx = lines.length - 1;
+                             const currentLastLine = lines[lastIdx];
+                             if (currentLastLine.length + 3 > idealLineLength && idealLineLength > 3) {
+                                lines[lastIdx] = currentLastLine.substring(0, idealLineLength - 3) + '...';
+                             } else if (currentLastLine.length < idealLineLength) {
+                                lines[lastIdx] = currentLastLine + '...';
+                             }
+                        }
+                        currentLine = '';
+                        break;
+                    }
+                }
+                if (word.length > idealLineLength) {
+                    if (lines.length < maxLinesCount) {
+                        lines.push(word.substring(0, idealLineLength - 3) + '...');
+                         if (lines.length === maxLinesCount) {
+                            currentLine = '';
+                            break;
+                         }
+                    }
+                    currentLine = '';
+                } else {
+                    currentLine = word;
+                }
+            }
+        }
+
+        if (currentLine !== '') {
+            if (lines.length < maxLinesCount) {
+                lines.push(currentLine.length > idealLineLength && idealLineLength > 3 ? currentLine.substring(0, idealLineLength-3)+"..." : currentLine);
+            } else if (lines.length === maxLinesCount) {
+                if (lines.length > 0 && !lines[lines.length - 1].endsWith('...')) {
+                    const lastIdx = lines.length - 1;
+                    const currentLastLine = lines[lastIdx];
+                     if (currentLastLine.length + 3 > idealLineLength && idealLineLength > 3) {
+                       lines[lastIdx] = currentLastLine.substring(0, idealLineLength - 3) + '...';
+                    } else if (currentLastLine.length < idealLineLength) {
+                       lines[lastIdx] = currentLastLine + '...';
+                    }
+                }
+            }
+        }
+
+        if (lines.length === 0 && originalLabel) {
+             if(originalLabel.length > idealLineLength && idealLineLength > 3) return [originalLabel.substring(0, idealLineLength-3) + "..."];
+            return [originalLabel];
+        }
+
+        return lines.length > 0 ? lines : [''];
+    }
+
 
     useEffect(() => {
         const fetchQuestionnaire = async () => {
@@ -314,30 +451,43 @@ function AnalysisPage() {
             const { questionText, questionType, questionRealId, counts } = aggregatedData;
             const canChart = Object.keys(counts).length > 0 && questionType !== 'text';
             if (!canChart) {
-                chartData[questionIdKey] = { questionText, questionType, questionRealId, labels: [], datasets: [], analysisText: "(Нет данных для графика)" };
+                chartData[questionIdKey] = { questionText, questionType, questionRealId, labels: [], datasets: [], analysisParts: ["(Нет данных для графика)"], analysisText: "(Нет данных для графика)" };
                 return;
             }
             const sortedAnswers = Object.entries(counts).sort(([, countA], [, countB]) => countB - countA);
-            const labels = sortedAnswers.map(([text]) => text);
+
+            const labelsRaw = sortedAnswers.map(([text]) => text);
+            const formattedLabels = labelsRaw.map(label =>
+                formatLabelsForChartJS(
+                    String(label),
+                    questionType === 'checkbox' ? 25 : 20,
+                    questionType === 'checkbox' ? 2 : 2
+                )
+            );
+
             const data = sortedAnswers.map(([, count]) => count);
-            const backgroundColors = labels.map((_, i) => `hsl(${(i * 137.508) % 360}, 70%, 65%)`);
+            const backgroundColors = formattedLabels.map((_, i) => `hsl(${(i * 137.508) % 360}, 70%, 65%)`);
             const borderColors = backgroundColors.map(color => color.replace('65%', '50%'));
-            let analysisText = "";
+            
+            const analysisParts = [];
             if (sortedAnswers.length > 0) {
                 const mostPopular = sortedAnswers[0];
-                analysisText = `Самый популярный ответ: "${mostPopular[0]}" (${mostPopular[1]} голос(а)).`;
+                analysisParts.push(`Самый популярный ответ: "${mostPopular[0]}" (${mostPopular[1]} голос(а)).`);
                 if (sortedAnswers.length > 1) {
                     const leastPopular = sortedAnswers[sortedAnswers.length - 1];
                     if (mostPopular[0] !== leastPopular[0]) {
-                        analysisText += ` Самый редкий: "${leastPopular[0]}" (${leastPopular[1]} голос(а)).`;
+                        analysisParts.push(`Самый редкий: "${leastPopular[0]}" (${leastPopular[1]} голос(а)).`);
                     }
                 }
+            } else {
+                analysisParts.push("(Нет данных для анализа)");
             }
+
             chartData[questionIdKey] = {
                 questionText: questionText,
                 questionType: questionType,
                 questionRealId: questionRealId,
-                labels: labels,
+                labels: formattedLabels,
                 datasets: [{
                     label: '# голосов',
                     data: data,
@@ -345,7 +495,8 @@ function AnalysisPage() {
                     borderColor: borderColors,
                     borderWidth: 1,
                 }],
-                analysisText: analysisText,
+                analysisParts: analysisParts,
+                analysisText: analysisParts.join('\n'),
             };
         });
         return chartData;
@@ -476,9 +627,10 @@ function AnalysisPage() {
                 currentRowCharts++;
                 const imageRowStart = currentRowCharts -1;
                 if (imageId) {
-                    const imgWidth = 480;
-                    const imgHeight = isDoughnut ? 380 : 330;
+                    const imgWidth = 480; 
+                    const imgHeight = isDoughnut ? 380 : 330; 
                     const approxImageHeightInRows = isDoughnut ? 20 : 17;
+                    
                     ws_charts.addImage(imageId, {
                         tl: { col: 0.1, row: imageRowStart },
                         ext: { width: imgWidth, height: imgHeight }
@@ -487,15 +639,18 @@ function AnalysisPage() {
                          ws_charts.addRow([]);
                     }
                     currentRowCharts += approxImageHeightInRows;
-                    const analysisText = preparedChartData[qIdKey]?.analysisText;
-                    if (analysisText) {
-                        const analysisRow = ws_charts.addRow([analysisText]);
+
+                    const analysisTextForExcel = preparedChartData[qIdKey]?.analysisText;
+                    if (analysisTextForExcel) {
+                        const analysisRow = ws_charts.addRow([analysisTextForExcel]);
                         analysisRow.getCell(1).alignment = { wrapText: true, vertical: 'top' };
                         ws_charts.mergeCells(analysisRow.number, 1, analysisRow.number, 5);
-                        analysisRow.height = 30;
+                        analysisRow.height = Math.max(30, analysisTextForExcel.split('\n').length * 15);
                         currentRowCharts++;
                     }
                 } else {
+                    const errorText = `(Не удалось вставить изображение для вопроса "${questionText}". ${error ? `Причина: ${error}` : ''})`;
+                    ws_charts.addRow([errorText]);
                     ws_charts.getCell(`A${currentRowCharts}`).font = { color: { argb: 'FFFF0000' } };
                     ws_charts.getCell(`A${currentRowCharts}`).alignment = { wrapText: true };
                     currentRowCharts++;
@@ -645,17 +800,13 @@ function AnalysisPage() {
             const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
             const url = URL.createObjectURL(blob);
-            const newWindow = window.open(url, '_blank');
-
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                alert('Не удалось открыть новое окно для скачивания. Возможно, оно было заблокировано вашим браузером. Пожалуйста, разрешите всплывающие окна для этого сайта и попробуйте снова.');
-                console.log("Новое окно не открылось, возможно заблокировано.");
-            } else {
-                console.log(`Новое окно для скачивания файла ${filename} должно было открыться.`);
-                newWindow.focus();
-            }
-
-            setTimeout(() => URL.revokeObjectURL(url), 100);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
 
         } catch (error) {
             console.error("Ошибка при экспорте в Excel:", error);
@@ -687,23 +838,63 @@ function AnalysisPage() {
         if (!chartData || Object.keys(chartData).length === 0) return <p>Нет данных для построения графиков.</p>;
         const chartableEntries = Object.entries(chartData).filter(([qIdKey, data]) => data?.labels?.length > 0);
         if (chartableEntries.length === 0) return <p>Нет вопросов с вариантами ответов для построения графиков.</p>;
+        
         return (
             <> {chartableEntries.map(([qIdKey, data]) => {
                 const ChartComponent = (data.labels.length <= 5 && data.questionType !== 'checkbox') ? Doughnut : Bar;
+                const isCheckboxBar = ChartComponent === Bar && data.questionType === 'checkbox';
+
                 const chartOptions = {
                     responsive: true, maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: ChartComponent === Doughnut ? 'top' : 'top', display: true },
+                        legend: { 
+                            position: 'top', 
+                            display: true,
+                            labels: isCheckboxBar ? { generateLabels: generateCheckboxBarLegendLabels, boxWidth: 10, padding: 10 } : { boxWidth: 10, padding: 10 },
+                        },
                         title: { display: false },
                         tooltip: { enabled: true }
                     },
-                    scales: ChartComponent === Bar ? { y: { beginAtZero: true, ticks: { precision: 0 } } } : undefined,
+                    scales: ChartComponent === Bar ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        },
+                        x: {
+                            ticks: {
+                                display: !isCheckboxBar,
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                font: {
+                                    size: (data.labels.length > 8 && !isCheckboxBar ? 9 : 10)
+                                },
+                            }
+                        }
+                    } : undefined,
                 };
+
+                let chartWrapperHeight = (ChartComponent === Doughnut || !data.labels) ? '300px' : 'auto';
+                if (ChartComponent === Bar && data.labels) {
+                    const numLabels = data.labels.length;
+                    const numLinesPerLabelMax = isCheckboxBar ? 1 : data.labels.reduce((max, labelArray) => Math.max(max, Array.isArray(labelArray) ? labelArray.length : 1), 1);
+                    const baseHeight = isCheckboxBar ? 80 : 120;
+                    const labelSpace = isCheckboxBar ? (numLabels * 5) : (numLabels * (15 + numLinesPerLabelMax * 5));
+                    const calculatedHeight = baseHeight + labelSpace + (numLinesPerLabelMax * 10);
+                    chartWrapperHeight = `${Math.max(300, Math.min(650, calculatedHeight))}px`;
+                }
+
                 return (
                     <div key={qIdKey} className="modal-chart-container">
                         <h3 className="modal-chart-title">{`${chartTitlePrefix}${data.questionText}`}</h3>
-                        <div className="modal-chart-wrapper"><ChartComponent options={chartOptions} data={data} /></div>
-                        <div className="modal-textual-analysis-item">{data.analysisText && <p>{data.analysisText}</p>}</div>
+                        <div className="modal-chart-wrapper" style={{ height: chartWrapperHeight }}>
+                            <ChartComponent options={chartOptions} data={data} />
+                        </div>
+                        <div className="modal-textual-analysis-item">
+                            {data.analysisParts && data.analysisParts.map((part, index) => (
+                                <p key={index}>{part}</p>
+                            ))}
+                        </div>
                     </div>);
             })}
             </>);

@@ -8,72 +8,57 @@ import logo from './../../img/logo_checklist.png';
 import './Navbar.css';
 
 const Navbar = () => {
-    const { isLoggedIn, login, logout } = useContext(AuthContext);
+    const { isLoggedIn, login, logout, setIsLoggedIn } = useContext(AuthContext);
     const [isLoginModalOpen, setLoginModalOpen] = useState(false);
     const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
     const [isMenuOpen, setMenuOpen] = useState(false);
+    const [notification, setNotification] = useState(''); // <-- Новое состояние
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
-    // Функции для управления модальными окнами
     const openLoginModal = () => setLoginModalOpen(true);
     const closeLoginModal = () => setLoginModalOpen(false);
     const openRegisterModal = () => setRegisterModalOpen(true);
     const closeRegisterModal = () => setRegisterModalOpen(false);
 
-    // Функция для переключения мобильного меню
     const toggleMenu = () => setMenuOpen(!isMenuOpen);
 
-    // Закрытие меню при клике вне его
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
                 setMenuOpen(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        console.log("isLoginModalOpen:", isLoginModalOpen);
-        console.log("isRegisterModalOpen:", isRegisterModalOpen);
-    }, [isLoginModalOpen, isRegisterModalOpen]);
-
-    // Обработчик выхода
     const handleLogout = () => {
-        logout(); // Вызываем функцию выхода из AuthContext
-        navigate('/Header'); // Перенаправляем на /HEADER
+        logout();
+        navigate('/Header');
+        setNotification('Вы успешно вышли из аккаунта');
+        setTimeout(() => setNotification(''), 3000); // Скрыть через 3 сек
     };
 
     return (
         <>
+            {/* Уведомление */}
+            {notification && <div className="notification">{notification}</div>}
+
             <nav className="nav">
                 <div className="container">
                     <div className="nav-row">
-                        {/* Логотип */}
                         <img src={logo} alt="Project img" className="project__img" />
                         <NavLink to="/HEADER" className="logo">
-                            Конструктор
-                            <span>анкет</span>
+                            Конструктор<span>анкет</span>
                         </NavLink>
 
-                        {/* Кнопка темной темы */}
-                        {/* <BtnDarkMode /> */}
-
-                        {/* Кнопка гамбургера для мобильного меню */}
                         <button className="hamburger" onClick={toggleMenu}>
                             ☰
                         </button>
 
-                        {/* Меню навигации */}
                         <ul ref={menuRef} className={`nav-list ${isMenuOpen ? 'open' : ''}`}>
                             {isLoggedIn ? (
-                                // Если пользователь авторизован
                                 <>
                                     <li className="nav-list__item">
                                         <button onClick={() => { navigate('/Account'); setMenuOpen(false); }} className="nav-button">
@@ -81,13 +66,12 @@ const Navbar = () => {
                                         </button>
                                     </li>
                                     <li className="nav-list__item">
-                                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="nav-button">
+                                        <button onClick={handleLogout} className="nav-button">
                                             Выйти
                                         </button>
                                     </li>
                                 </>
                             ) : (
-                                // Если пользователь не авторизован
                                 <>
                                     <li className="nav-list__item">
                                         <button onClick={() => { openLoginModal(); setMenuOpen(false); }} className="nav-button">
@@ -106,21 +90,30 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* Модальное окно для входа */}
+            {/* Модальные окна */}
             {isLoginModalOpen && (
                 <ModalLogin
                     onClose={closeLoginModal}
                     onRegisterOpen={openRegisterModal}
-                    onLoginSuccess={login} // Обновляем состояние после входа
+                    onLoginSuccess={() => {
+                        login();
+                        setNotification('Вы вошли в аккаунт');
+                        setTimeout(() => setNotification(''), 3000);
+                        closeLoginModal();
+                    }}
                 />
             )}
 
-            {/* Модальное окно для регистрации */}
             {isRegisterModalOpen && (
                 <ModalRegister
                     onClose={closeRegisterModal}
                     onLoginOpen={openLoginModal}
-                    onRegisterSuccess={login} // Обновляем состояние после регистрации
+                    onRegisterSuccess={() => {
+                        login();
+                        setNotification('Регистрация прошла успешно!');
+                        setTimeout(() => setNotification(''), 3000);
+                        closeRegisterModal();
+                    }}
                 />
             )}
         </>

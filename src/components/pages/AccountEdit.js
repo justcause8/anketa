@@ -10,6 +10,7 @@ function AccountEditPage() {
     const [initialData, setInitialData] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -40,19 +41,22 @@ function AccountEditPage() {
     };
 
     const handleSave = async () => {
+        if (isLoading) return;
         if (!hasChanges()) {
             alert('Нет изменений для сохранения.');
             return;
         }
 
+        setIsLoading(true);
+
         try {
             await apiClient.put('/User/update', { nick, email, password });
-            alert('Данные успешно сохранены.');
             setInitialData({ nick, email, password });
             navigate('/Account');
         } catch (error) {
             console.error('Ошибка при сохранении данных:', error);
-            alert('Не удалось сохранить данные.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -91,8 +95,12 @@ function AccountEditPage() {
                     />
                 </div>
                 <div className="ButtonSaveContainer">
-                    <button className="ButtonSave" onClick={handleSave}>
-                        Сохранить
+                    <button
+                        className="ButtonSave"
+                        onClick={handleSave}
+                        disabled={isLoading} 
+                    >
+                        {isLoading ? 'Отправка...' : 'Сохранить'} 
                     </button>
                 </div>
             </div>

@@ -22,6 +22,9 @@ const EditSurveyPage = () => {
 
     const options = ["Открытый", "Закрытый", "Множественный выбор", "Шкала", "Выпадающий список"];
     const ANIMATION_DURATION = 450;
+    
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const getQuestionIdentifier = (q) => q.id ?? q.tempId;
     const getAnswerIdentifier = (a) => a.id ?? a.tempId;
@@ -146,16 +149,16 @@ const EditSurveyPage = () => {
                     animationState: null,
                 };
 
-                 const choiceTypes = ["Закрытый", "Множественный выбор", "Выпадающий список", "radio", "checkbox", "select"];
-                 if (choiceTypes.includes(displayType)) {
-                     baseQuestion.answers = q.options?.map(o => ({
-                         id: o.id,
-                         tempId: null,
-                         text: o.optionText || "",
-                         isNew: false,
-                         isDeleting: false,
-                     })) || [];
-                 }
+                const choiceTypes = ["Закрытый", "Множественный выбор", "Выпадающий список", "radio", "checkbox", "select"];
+                if (choiceTypes.includes(displayType)) {
+                    baseQuestion.answers = q.options?.map(o => ({
+                        id: o.id,
+                        tempId: null,
+                        text: o.optionText || "",
+                        isNew: false,
+                        isDeleting: false,
+                    })) || [];
+                }
 
                 if (displayType === "Шкала" || displayType === "scale") {
                     const scaleAnswer = q.answers?.find(a => a.text?.includes('|'));
@@ -202,13 +205,13 @@ const EditSurveyPage = () => {
             const identifier = getQuestionIdentifier(question);
             const errorKey = identifier;
 
-             if (!question.text.trim() && question.type !== "Шкала" && question.type !== "scale") {
-                 errors[errorKey] = "Текст вопроса не может быть пустым";
-                 isValid = false;
-             } else if (question.text.length > 250) {
-                 errors[errorKey] = "Текст вопроса не может превышать 250 символов";
-                 isValid = false;
-             }
+            if (!question.text.trim() && question.type !== "Шкала" && question.type !== "scale") {
+                errors[errorKey] = "Текст вопроса не может быть пустым";
+                isValid = false;
+            } else if (question.text.length > 250) {
+                errors[errorKey] = "Текст вопроса не может превышать 250 символов";
+                isValid = false;
+            }
 
 
             if (question.type === "Шкала" || question.type === "scale") {
@@ -218,15 +221,15 @@ const EditSurveyPage = () => {
                         isValid = false;
                     }
                 } else {
-                     if (question.leftScaleValue.length > 250 || question.rightScaleValue.length > 250) {
-                         errors[errorKey] = "Значения шкалы не могут превышать 250 символов";
-                         isValid = false;
-                     }
-                     if (question.divisions < 2 || question.divisions > 10) {
+                    if (question.leftScaleValue.length > 250 || question.rightScaleValue.length > 250) {
+                        errors[errorKey] = "Значения шкалы не могут превышать 250 символов";
+                        isValid = false;
+                    }
+                    if (question.divisions < 2 || question.divisions > 10) {
                         errors[errorKey] = "Количество делений должно быть от 2 до 10";
                         isValid = false;
-                     }
-                 }
+                    }
+                }
             }
 
             const choiceTypes = ["Закрытый", "Множественный выбор", "Выпадающий список", "radio", "checkbox", "select"];
@@ -236,16 +239,16 @@ const EditSurveyPage = () => {
                     errors[errorKey] = "Необходимо добавить хотя бы один вариант ответа";
                     isValid = false;
                 } else {
-                     const emptyAnswers = activeAnswers.filter(a => !a.text.trim());
-                     if (emptyAnswers.length > 0) {
-                         errors[errorKey] = "Варианты ответов не могут быть пустыми";
-                         isValid = false;
+                    const emptyAnswers = activeAnswers.filter(a => !a.text.trim());
+                    if (emptyAnswers.length > 0) {
+                        errors[errorKey] = "Варианты ответов не могут быть пустыми";
+                        isValid = false;
                     } else {
-                         const invalidAnswers = activeAnswers.filter(a => a.text.length > 250);
-                         if (invalidAnswers.length > 0) {
-                             errors[errorKey] = "Варианты ответов не могут превышать 250 символов";
-                             isValid = false;
-                         }
+                        const invalidAnswers = activeAnswers.filter(a => a.text.length > 250);
+                        if (invalidAnswers.length > 0) {
+                            errors[errorKey] = "Варианты ответов не могут превышать 250 символов";
+                            isValid = false;
+                        }
                     }
                     if (activeAnswers.length < 2) {
                         errors[errorKey] = "Необходимо как минимум два варианта ответа";
@@ -260,6 +263,10 @@ const EditSurveyPage = () => {
     };
 
     const handleSave = async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+
         clearAllAnimationStates();
         setError("");
         setQuestionErrors({});
@@ -268,6 +275,7 @@ const EditSurveyPage = () => {
         if (!validateQuestions()) {
             console.log("Ошибка валидации", questionErrors);
             setError("Пожалуйста, исправьте ошибки в анкете перед сохранением.");
+            setIsLoading(false);
             return;
         }
 
@@ -331,20 +339,20 @@ const EditSurveyPage = () => {
                     }
                 }
                 else if (!choiceTypes.includes(question.type) && backendId) {
-                     for (const answer of question.answers.filter(a => a.id && !a.isNew)) {
-                         console.log(`  Удаление лишней опции ID: ${answer.id} у вопроса ${backendId} (смена типа)`);
-                          try {
-                             await apiClient.delete(`/questionnaire/${questionnaireId}/questions/${backendId}/options/${answer.id}`);
-                         } catch (optErr) { console.error(`  Ошибка удаления лишней опции ${answer.id}:`, optErr.response?.data || optErr.message); }
-                     }
+                    for (const answer of question.answers.filter(a => a.id && !a.isNew)) {
+                        console.log(`  Удаление лишней опции ID: ${answer.id} у вопроса ${backendId} (смена типа)`);
+                        try {
+                            await apiClient.delete(`/questionnaire/${questionnaireId}/questions/${backendId}/options/${answer.id}`);
+                        } catch (optErr) { console.error(`  Ошибка удаления лишней опции ${answer.id}:`, optErr.response?.data || optErr.message); }
+                    }
                 }
             }
 
             for (const deletedId of deletedQuestionIds) {
                 console.log(`Удаление вопроса ID: ${deletedId}...`);
-                 try {
+                try {
                     await apiClient.delete(`/questionnaire/${questionnaireId}/questions/${deletedId}`);
-                 } catch (delErr) { console.error(`Ошибка удаления вопроса ${deletedId}:`, delErr.response?.data || delErr.message); }
+                } catch (delErr) { console.error(`Ошибка удаления вопроса ${deletedId}:`, delErr.response?.data || delErr.message); }
             }
 
             setDeletedQuestionIds([]);
@@ -353,6 +361,8 @@ const EditSurveyPage = () => {
         } catch (err) {
             console.error('Ошибка при сохранении анкеты:', err.response?.data || err.message);
             setError(`Ошибка при сохранении: ${err.response?.data?.title || err.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -386,7 +396,7 @@ const EditSurveyPage = () => {
 
             if (draggedIndex !== -1 && targetIndex !== -1) {
                 const direction = draggedIndex < targetIndex ? 'make-space-up' : 'make-space-down';
-                 setQuestions(prev => prev.map(q =>
+                setQuestions(prev => prev.map(q =>
                     getQuestionIdentifier(q) === targetIdentifier ? { ...q, animationState: direction } : q
                 ));
             }
@@ -406,12 +416,12 @@ const EditSurveyPage = () => {
     const handleDrop = useCallback((e, targetIdentifier) => {
         e.preventDefault();
         if (!draggedId || draggedId === targetIdentifier) {
-             if (dragOverId) clearAnimationState(dragOverId);
-             setDragOverId(null);
-             if (draggedId && questionRefs.current[draggedId]) {
-                 questionRefs.current[draggedId].classList.remove('dragging');
-             }
-             setDraggedId(null);
+            if (dragOverId) clearAnimationState(dragOverId);
+            setDragOverId(null);
+            if (draggedId && questionRefs.current[draggedId]) {
+                questionRefs.current[draggedId].classList.remove('dragging');
+            }
+            setDraggedId(null);
             return;
         }
 
@@ -426,7 +436,7 @@ const EditSurveyPage = () => {
         setQuestions(prevQuestions => {
             const updatedQuestions = [...prevQuestions];
             const [draggedItem] = updatedQuestions.splice(draggedIndex, 1);
-             const cleanDraggedItem = { ...draggedItem, animationState: null, isDeleting: false };
+            const cleanDraggedItem = { ...draggedItem, animationState: null, isDeleting: false };
             updatedQuestions.splice(targetIndex, 0, cleanDraggedItem);
             return updateDisplayIds(updatedQuestions.map(q => ({ ...q, isDeleting: false })));
         });
@@ -468,8 +478,8 @@ const EditSurveyPage = () => {
         };
 
         setQuestions(prevQuestions => {
-             const index = prevQuestions.findIndex(q => getQuestionIdentifier(q) === afterIdentifier);
-             const insertIndex = index !== -1 ? index + 1 : prevQuestions.length;
+            const index = prevQuestions.findIndex(q => getQuestionIdentifier(q) === afterIdentifier);
+            const insertIndex = index !== -1 ? index + 1 : prevQuestions.length;
             const updatedQuestions = [...prevQuestions];
             updatedQuestions.splice(insertIndex, 0, newQuestion);
             return updateDisplayIds(updatedQuestions);
@@ -561,15 +571,15 @@ const EditSurveyPage = () => {
         setQuestions(
             questions.map((q) => {
                 if (getQuestionIdentifier(q) === identifier) {
-                     const choiceTypes = ["Закрытый", "Множественный выбор", "Выпадающий список", "radio", "checkbox", "select"];
-                     const isChoiceType = choiceTypes.includes(option);
-                     const needsDefaultAnswers = isChoiceType && q.answers.filter(a => !a.isDeleting).length === 0;
-                     const defaultAnswers = [
-                         { tempId: `a_${Date.now()}_1_${Math.random().toString(36).substring(2, 5)}`, id: null, text: "", isNew: true, isDeleting: false },
-                         { tempId: `a_${Date.now()}_2_${Math.random().toString(36).substring(2, 5)}`, id: null, text: "", isNew: true, isDeleting: false }
-                     ];
+                    const choiceTypes = ["Закрытый", "Множественный выбор", "Выпадающий список", "radio", "checkbox", "select"];
+                    const isChoiceType = choiceTypes.includes(option);
+                    const needsDefaultAnswers = isChoiceType && q.answers.filter(a => !a.isDeleting).length === 0;
+                    const defaultAnswers = [
+                        { tempId: `a_${Date.now()}_1_${Math.random().toString(36).substring(2, 5)}`, id: null, text: "", isNew: true, isDeleting: false },
+                        { tempId: `a_${Date.now()}_2_${Math.random().toString(36).substring(2, 5)}`, id: null, text: "", isNew: true, isDeleting: false }
+                    ];
 
-                     return {
+                    return {
                         ...q,
                         type: option,
                         answers: isChoiceType
@@ -679,13 +689,13 @@ const EditSurveyPage = () => {
         setQuestions(prevQuestions => prevQuestions.map(q =>
             getQuestionIdentifier(q) === identifier ? { ...q, [field]: value } : q
         ));
-         if (questionErrors[identifier]?.includes("шкалы") || questionErrors[identifier]?.includes("делений")) {
-             setQuestionErrors(prevErrors => {
-                 const newErrors = { ...prevErrors };
-                 delete newErrors[identifier];
-                 return newErrors;
-             });
-         }
+        if (questionErrors[identifier]?.includes("шкалы") || questionErrors[identifier]?.includes("делений")) {
+            setQuestionErrors(prevErrors => {
+                const newErrors = { ...prevErrors };
+                delete newErrors[identifier];
+                return newErrors;
+            });
+        }
     };
 
     const getQuestionContainerClassName = (question) => {
@@ -819,8 +829,8 @@ const EditSurveyPage = () => {
                                                 </div>
                                             );
                                         })}
-                                         {questionErrors[identifier] && (questionErrors[identifier].includes("ответ") || questionErrors[identifier].includes("пустыми")) && (
-                                             <p className="error-message-create">{questionErrors[identifier]}</p>
+                                        {questionErrors[identifier] && (questionErrors[identifier].includes("ответ") || questionErrors[identifier].includes("пустыми")) && (
+                                            <p className="error-message-create">{questionErrors[identifier]}</p>
                                         )}
                                         {deleteError && <p className="error-message-create">{deleteError}</p>}
                                         <button
@@ -857,7 +867,7 @@ const EditSurveyPage = () => {
                                             style={{ marginBottom: '10px', width: 'calc(100% - 10px)' }}
                                             aria-label={`Правое значение шкалы для вопроса ${question.displayId}`}
                                         />
-                                         {questionErrors[identifier] && questionErrors[identifier].includes("Значения шкалы") && (
+                                        {questionErrors[identifier] && questionErrors[identifier].includes("Значения шкалы") && (
                                             <p className="error-message-create">{questionErrors[identifier]}</p>
                                         )}
                                         <div
@@ -878,14 +888,14 @@ const EditSurveyPage = () => {
                                             />
                                         </div>
                                         {questionErrors[identifier] && questionErrors[identifier].includes("делений") && (
-                                             <p className="error-message-create">{questionErrors[identifier]}</p>
+                                            <p className="error-message-create">{questionErrors[identifier]}</p>
                                         )}
                                     </div>
                                 )}
 
                             </div>
 
-                             <div className="action">
+                            <div className="action">
                                 <button
                                     type="button"
                                     className="newBlock"
@@ -950,8 +960,9 @@ const EditSurveyPage = () => {
                         onClick={handleSave}
                         className="ButtonSave"
                         type="button"
+                        disabled={isLoading}
                     >
-                        Сохранить изменения
+                        {isLoading ? 'Отправка...' : 'Сохранить изменения'}
                     </button>
                 </div>
             </div>

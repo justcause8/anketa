@@ -127,11 +127,9 @@
         margin-right: 10px;
     }
     .reg-btn{
-        margin-left:25px;
-
+        justify-content: center;
     }
     .perehod{
-        padding-left:15px;
+        justify-content: center;
 }
-
 }
