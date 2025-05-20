@@ -648,13 +648,14 @@ function AnalysisPage() {
                         analysisRow.height = Math.max(30, analysisTextForExcel.split('\n').length * 15);
                         currentRowCharts++;
                     }
-                } else {
-                    // const errorText = `(Не удалось вставить изображение для вопроса "${questionText}". ${error ? `Причина: ${error}` : ''})`;
-                    // ws_charts.addRow([errorText]);
-                    ws_charts.getCell(`A${currentRowCharts}`).font = { color: { argb: 'FFFF0000' } };
-                    ws_charts.getCell(`A${currentRowCharts}`).alignment = { wrapText: true };
-                    currentRowCharts++;
-                }
+                } 
+                // else {
+                //     const errorText = `(Не удалось вставить изображение для вопроса "${questionText}". ${error ? `Причина: ${error}` : ''})`;
+                //     ws_charts.addRow([errorText]);
+                //     ws_charts.getCell(`A${currentRowCharts}`).font = { color: { argb: 'FFFF0000' } };
+                //     ws_charts.getCell(`A${currentRowCharts}`).alignment = { wrapText: true };
+                //     currentRowCharts++;
+                // }
                 ws_charts.addRow([]);
                 currentRowCharts++;
             });
